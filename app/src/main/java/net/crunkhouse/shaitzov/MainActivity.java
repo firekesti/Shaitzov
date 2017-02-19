@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceDown.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
-        PlayingCardAdapter faceDownAdapter = new PlayingCardAdapter(playerFaceDown, true);
+        PlayingCardAdapter faceDownAdapter = new PlayingCardAdapter(playerFaceDown, CardSource.FACE_DOWN);
         faceDownView.setAdapter(faceDownAdapter);
         faceDownView.addItemDecoration(new CardSpacingDecorator(faceDownView.getContext()));
         faceDownView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceUpView = (RecyclerView) findViewById(R.id.player_faceup);
-        PlayingCardAdapter faceUpAdapter = new PlayingCardAdapter(playerFaceUp);
+        PlayingCardAdapter faceUpAdapter = new PlayingCardAdapter(playerFaceUp, CardSource.FACE_UP);
         faceUpView.setAdapter(faceUpAdapter);
         faceUpView.addItemDecoration(new CardSpacingDecorator(faceUpView.getContext()));
         faceUpView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -50,17 +50,16 @@ public class MainActivity extends AppCompatActivity {
             playerHand.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView handView = (RecyclerView) findViewById(R.id.player_hand);
-        PlayingCardAdapter playerHandAdapter = new PlayingCardAdapter(playerHand);
+        PlayingCardAdapter playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND);
         handView.setAdapter(playerHandAdapter);
         handView.addItemDecoration(new CardOverlapDecorator(handView.getContext()));
         handView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Add the deck
         RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
-        PlayingCardAdapter deckAdapter = new PlayingCardAdapter(deck, true);
+        PlayingCardAdapter deckAdapter = new PlayingCardAdapter(deck, CardSource.DECK);
         deckView.setAdapter(deckAdapter);
         deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
-
     }
 }

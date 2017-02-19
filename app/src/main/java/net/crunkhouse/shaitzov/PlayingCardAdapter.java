@@ -8,15 +8,13 @@ import java.util.ArrayList;
 
 class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
     private ArrayList<PlayingCard> cards;
-    private boolean areCardsFaceDown;
+    private boolean cardsFaceDown;
 
-    public PlayingCardAdapter(ArrayList<PlayingCard> cards) {
-        this(cards, false);
-    }
-
-    public PlayingCardAdapter(ArrayList<PlayingCard> cards, boolean faceDown) {
+    public PlayingCardAdapter(ArrayList<PlayingCard> cards, CardSource source) {
         this.cards = cards;
-        this.areCardsFaceDown = faceDown;
+        if (source == CardSource.FACE_DOWN || source == CardSource.DECK) {
+            cardsFaceDown = true;
+        }
     }
 
     @Override
@@ -27,7 +25,7 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.view.setCard(cards.get(position));
-        holder.view.setFaceDown(areCardsFaceDown);
+        holder.view.setFaceDown(cardsFaceDown);
     }
 
     @Override
