@@ -8,9 +8,15 @@ import java.util.ArrayList;
 
 class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
     private ArrayList<PlayingCard> cards;
+    private boolean areCardsFaceDown;
 
     public PlayingCardAdapter(ArrayList<PlayingCard> cards) {
+        this(cards, false);
+    }
+
+    public PlayingCardAdapter(ArrayList<PlayingCard> cards, boolean faceDown) {
         this.cards = cards;
+        this.areCardsFaceDown = faceDown;
     }
 
     @Override
@@ -21,6 +27,7 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.view.setCard(cards.get(position));
+        holder.view.setFaceDown(areCardsFaceDown);
     }
 
     @Override

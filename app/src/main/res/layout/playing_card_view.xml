@@ -8,14 +8,25 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="32sp"
-        tools:text="5"
-        tools:ignore="RtlHardcoded"/>
+        tools:ignore="RtlHardcoded"
+        tools:text="5"/>
 
     <ImageView
         android:id="@+id/suit"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginLeft="8dp"
+        android:contentDescription="@null"
         tools:ignore="RtlHardcoded"
         tools:src="@drawable/suit_club"/>
+
+    <View
+        android:id="@+id/back_face"
+        android:layout_width="76dp"
+        android:layout_height="112dp"
+        android:layout_margin="8dp"
+        android:background="@color/colorAccent"
+        android:contentDescription="@null"
+        android:visibility="gone"
+        tools:ignore="RtlHardcoded"/>
 </merge>

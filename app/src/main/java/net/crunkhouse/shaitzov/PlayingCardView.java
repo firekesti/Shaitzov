@@ -17,6 +17,7 @@ public class PlayingCardView extends LinearLayout {
 
     private TextView valueView;
     private ImageView suitView;
+    private View backFaceView;
 
     public PlayingCardView(Context context) {
         super(context);
@@ -38,6 +39,15 @@ public class PlayingCardView extends LinearLayout {
         View rootView = inflate(context, R.layout.playing_card_view, this);
         valueView = (TextView) rootView.findViewById(R.id.value);
         suitView = (ImageView) rootView.findViewById(R.id.suit);
+        backFaceView = rootView.findViewById(R.id.back_face);
+    }
+
+    public void setFaceDown(boolean faceDown) {
+        if (faceDown) {
+            valueView.setVisibility(View.GONE);
+            suitView.setVisibility(View.GONE);
+            backFaceView.setVisibility(VISIBLE);
+        }
     }
 
     public void setCard(PlayingCard card) {
@@ -59,5 +69,6 @@ public class PlayingCardView extends LinearLayout {
                 break;
         }
         suitView.setImageDrawable(suitImage);
+        suitView.setContentDescription(card.getSuit().toString());
     }
 }
