@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/value"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="32sp"
+        tools:text="5"
+        tools:ignore="RtlHardcoded"/>
+
+    <ImageView
+        android:id="@+id/suit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="8dp"
+        tools:ignore="RtlHardcoded"
+        tools:src="@drawable/suit_club"/>
+</merge>
