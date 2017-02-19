@@ -54,5 +54,13 @@ public class MainActivity extends AppCompatActivity {
         handView.setAdapter(playerHandAdapter);
         handView.addItemDecoration(new CardOverlapDecorator(handView.getContext()));
         handView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        // Add the deck
+        RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
+        PlayingCardAdapter deckAdapter = new PlayingCardAdapter(deck, true);
+        deckView.setAdapter(deckAdapter);
+        deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
+        deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
+
     }
 }

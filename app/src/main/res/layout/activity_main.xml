@@ -8,25 +8,41 @@
     android:padding="16dp"
     tools:context="net.crunkhouse.shaitzov.MainActivity">
 
+    <!-- The deck -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/deck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+    <android.support.v4.widget.Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- The player's hand -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/player_hand"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp"/>
 
+    <!-- The face-up and face-down cards -->
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp">
+        android:layout_gravity="center">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/player_facedown"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/player_faceup"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </FrameLayout>
 </LinearLayout>
