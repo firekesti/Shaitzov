@@ -20,6 +20,7 @@
         tools:ignore="RtlHardcoded"
         tools:src="@drawable/suit_club"/>
 
+    <!-- TODO: make this the CRUNK!!! star -->
     <View
         android:id="@+id/back_face"
         android:layout_width="76dp"

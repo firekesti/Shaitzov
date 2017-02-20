@@ -45,6 +45,31 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
         return cards.size();
     }
 
+    public void remove(PlayingCard card) {
+        int pos = cards.indexOf(card);
+        cards.remove(pos);
+        notifyItemRemoved(pos);
+    }
+
+    public void add(PlayingCard card) {
+        cards.add(card);
+        notifyItemInserted(cards.indexOf(card));
+    }
+
+    public void addAll(ArrayList<PlayingCard> cardsToAdd) {
+        int oldsize = cards.size();
+        cards.addAll(cardsToAdd);
+        notifyItemRangeInserted(oldsize, cards.size());
+    }
+
+    public ArrayList<PlayingCard> getCards() {
+        return cards;
+    }
+
+    public void clear() {
+        notifyItemRangeRemoved(0, cards.size());
+        cards.clear();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public PlayingCardView view;
