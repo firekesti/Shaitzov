@@ -1,10 +1,13 @@
 package net.crunkhouse.shaitzov;
 
+import android.support.annotation.NonNull;
+
 /**
  * A model for a playing card.
  */
 
-public class PlayingCard {
+public class PlayingCard implements Comparable<PlayingCard> {
+
     public enum Suit {
         SPADE, HEART, CLUB, DIAMOND
     }
@@ -46,5 +49,23 @@ public class PlayingCard {
     @Override
     public String toString() {
         return value + " of " + suit;
+    }
+
+    /**
+     * Returns 1 if otherCard is less than this card,
+     * Returns 0 if they are the same value,
+     * Returns -1 if otherCard is greater than this card
+     * @param otherCard
+     * @return
+     */
+    @Override
+    public int compareTo(@NonNull PlayingCard otherCard) {
+        if (otherCard.getValue() < getValue()) {
+            return 1;
+        } else if (otherCard.getValue() == getValue()) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 }

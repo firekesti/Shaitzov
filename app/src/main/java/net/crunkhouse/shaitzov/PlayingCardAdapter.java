@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
     private ArrayList<PlayingCard> cards;
@@ -52,14 +53,38 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     }
 
     public void add(PlayingCard card) {
-        cards.add(card);
-        notifyItemInserted(cards.indexOf(card));
+        if (source == CardSource.HAND) {
+            boolean added = false;
+            // We want to keep the hand sorted by value.
+            for (int i = 0; i < cards.size(); i++) {
+                if (card.compareTo(cards.get(i)) <= 0) {
+                    // Once we've iterated to a pos where the new card is equal or greater, insert it
+                    cards.add(i, card);
+                    notifyItemInserted(i);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                cards.add(card);
+                notifyItemInserted(getItemCount() - 1);
+            }
+        } else {
+            cards.add(card);
+            notifyItemInserted(cards.indexOf(card));
+        }
     }
 
     public void addAll(ArrayList<PlayingCard> cardsToAdd) {
         int oldsize = cards.size();
         cards.addAll(cardsToAdd);
-        notifyItemRangeInserted(oldsize, cards.size());
+        if (source == CardSource.HAND) {
+            // We want to keep the hand sorted by value.
+            Collections.sort(cards);
+            notifyItemRangeChanged(0, cards.size());
+        } else {
+            notifyItemRangeInserted(oldsize, cards.size());
+        }
     }
 
     public ArrayList<PlayingCard> getCards() {
