@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private PlayingCardAdapter deckAdapter;
     private PlayingCardAdapter faceDownAdapter;
     private PlayingCardAdapter faceUpAdapter;
+    private RecyclerView handView;
+    private RecyclerView pileView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
             playerHand.add(PlayingCardUtils.drawFrom(deck));
         }
-        RecyclerView handView = (RecyclerView) findViewById(R.id.player_hand);
+        handView = (RecyclerView) findViewById(R.id.player_hand);
         playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND);
         handView.setAdapter(playerHandAdapter);
         handView.addItemDecoration(new CardOverlapDecorator(handView.getContext()));
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
         // Add the pile
-        RecyclerView pileView = (RecyclerView) findViewById(R.id.pile);
+        pileView = (RecyclerView) findViewById(R.id.pile);
         pileAdapter = new PlayingCardAdapter(pile, CardSource.PILE);
         pileView.setAdapter(pileAdapter);
         pileView.addItemDecoration(new PileOverlapDecorator(pileView.getContext()));
@@ -87,18 +89,21 @@ public class MainActivity extends AppCompatActivity {
                 // Can always play from the hand. Let's start here.
                 playerHandAdapter.remove(card);
                 pileAdapter.add(card);
+                pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
                 break;
             case DECK:
                 // If a deck card was clicked, we want to actually draw the top card
                 card = deckAdapter.getCards().get(deckAdapter.getItemCount() - 1);
                 deckAdapter.remove(card);
                 playerHandAdapter.add(card);
+                handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
                 break;
             case FACE_UP:
                 // Only do something if all player-hand cards are gone
                 if (playerHandAdapter.getItemCount() == 0) {
                     faceUpAdapter.remove(card);
                     pileAdapter.add(card);
+                    pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
                 }
                 break;
             case FACE_DOWN:
@@ -106,12 +111,14 @@ public class MainActivity extends AppCompatActivity {
                 if (faceUpAdapter.getItemCount() == 0 && playerHandAdapter.getItemCount() == 0) {
                     faceDownAdapter.remove(card);
                     pileAdapter.add(card);
+                    pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
                 }
                 break;
             case PILE:
                 // take all cards from pile, put in hand
                 ArrayList<PlayingCard> cards = pileAdapter.getCards();
                 playerHandAdapter.addAll(cards);
+                handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
                 pileAdapter.clear();
             default:
                 break;
