@@ -31,9 +31,9 @@ public class PlayingCardView extends LinearLayout {
 
     private void init(Context context) {
         setOrientation(LinearLayout.VERTICAL);
-        setBackgroundResource(R.drawable.card_background);
-        int width = DensityUtils.dpToPixel(context, 92);
-        int height = DensityUtils.dpToPixel(context, 128);
+        setBackgroundResource(R.drawable.card_outline);
+        int width = DensityUtils.dpToPixel(context, 60);
+        int height = DensityUtils.dpToPixel(context, 84);
         setMinimumHeight(height);
         setMinimumWidth(width);
         View rootView = inflate(context, R.layout.playing_card_view, this);

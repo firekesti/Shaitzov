@@ -14,7 +14,7 @@ public class CardSpacingDecorator extends RecyclerView.ItemDecoration {
     private int overlapAmount;
 
     public CardSpacingDecorator(Context context) {
-        overlapAmount = DensityUtils.dpToPixel(context, 16);
+        overlapAmount = DensityUtils.dpToPixel(context, 12);
     }
 
     @Override

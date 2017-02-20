@@ -6,14 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Created by kkelly on 2/19/17.
+ * A decoration that creates a tight "deck" view
  */
 
 class DeckOverlapDecorator extends RecyclerView.ItemDecoration {
     private int overlapAmount;
 
     public DeckOverlapDecorator(Context context) {
-        overlapAmount = DensityUtils.dpToPixel(context, -90);
+        overlapAmount = DensityUtils.dpToPixel(context, -58);
     }
 
     @Override

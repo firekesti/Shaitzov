@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         handView = (RecyclerView) findViewById(R.id.player_hand);
         playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND);
         handView.setAdapter(playerHandAdapter);
-        handView.addItemDecoration(new CardOverlapDecorator(handView.getContext()));
+        handView.addItemDecoration(new HandOverlapDecorator(handView.getContext()));
         handView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Add the deck

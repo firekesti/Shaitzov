@@ -14,7 +14,7 @@ public class PileOverlapDecorator extends RecyclerView.ItemDecoration {
     private int overlapAmount;
 
     public PileOverlapDecorator(Context context) {
-        overlapAmount = DensityUtils.dpToPixel(context, -70);
+        overlapAmount = DensityUtils.dpToPixel(context, -44);
     }
 
     @Override

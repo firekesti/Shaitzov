@@ -9,12 +9,12 @@ import android.view.View;
  * An ItemDecorator to overlap cards.
  */
 
-public class CardOverlapDecorator extends RecyclerView.ItemDecoration {
+public class HandOverlapDecorator extends RecyclerView.ItemDecoration {
 
     private int overlapAmount;
 
-    public CardOverlapDecorator(Context context) {
-        overlapAmount = DensityUtils.dpToPixel(context, -48);
+    public HandOverlapDecorator(Context context) {
+        overlapAmount = DensityUtils.dpToPixel(context, -16);
     }
 
     @Override

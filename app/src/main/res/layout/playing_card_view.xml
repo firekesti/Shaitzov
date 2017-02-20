@@ -4,18 +4,18 @@
 
     <TextView
         android:id="@+id/value"
-        android:layout_width="40dp"
+        android:layout_width="28dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="32sp"
+        android:textSize="20sp"
         tools:ignore="RtlHardcoded"
         tools:text="5"/>
 
     <ImageView
         android:id="@+id/suit"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginLeft="8dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="4dp"
         android:contentDescription="@null"
         tools:ignore="RtlHardcoded"
         tools:src="@drawable/suit_club"/>
@@ -23,10 +23,10 @@
     <!-- TODO: make this the CRUNK!!! star -->
     <View
         android:id="@+id/back_face"
-        android:layout_width="76dp"
-        android:layout_height="112dp"
-        android:layout_margin="8dp"
-        android:background="@color/colorAccent"
+        android:layout_width="52dp"
+        android:layout_height="76dp"
+        android:layout_margin="4dp"
+        android:background="@drawable/card_back"
         android:contentDescription="@null"
         android:visibility="gone"
         tools:ignore="RtlHardcoded"/>
