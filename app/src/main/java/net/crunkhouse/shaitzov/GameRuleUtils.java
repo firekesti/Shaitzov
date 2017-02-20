@@ -31,6 +31,10 @@ final class GameRuleUtils {
                     break;
                 }
             }
+            if (topPileCard.getValue() == 11) {
+                // If it's still a jack, that means it's jacks all the way down. Play anything.
+                return true;
+            }
         }
 
         // Otherwise, directly compare the values of the cards.

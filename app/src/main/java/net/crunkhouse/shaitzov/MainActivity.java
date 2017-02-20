@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 playerHandAdapter.addAll(cards);
                 handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
                 pileAdapter.clear();
+                currentDirection = PileDirection.UP;
             default:
                 break;
         }
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
             // Resolve special effects for 10, 4x, 7, 8
             if (GameRuleUtils.shouldBurnPile(card, pileAdapter.getCards())) {
                 pileAdapter.clear();
+                currentDirection = PileDirection.UP;
             } else if (GameRuleUtils.shouldDirectionSwitch(card)) {
                 if (currentDirection == PileDirection.DOWN) {
                     currentDirection = PileDirection.UP;
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Tell user they can't play that card right now.
             // TODO: snackbar it up?
-            Toast.makeText(this, "You can't play a " + card.getValue() + " on that pile", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You can't play a " + card.getValueName() + " on that pile", Toast.LENGTH_SHORT).show();
             return false;
         }
     }
