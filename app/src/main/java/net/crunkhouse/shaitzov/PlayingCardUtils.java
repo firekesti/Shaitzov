@@ -1,7 +1,7 @@
 package net.crunkhouse.shaitzov;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Collections;
 
 /**
  * Utilities for card-related functions.
@@ -39,10 +39,12 @@ final class PlayingCardUtils {
             // TODO: evil extra cards
         }
 
+        Collections.shuffle(deck);
+
         return deck;
     }
 
     static PlayingCard drawFrom(ArrayList<PlayingCard> deck) {
-        return deck.remove(new Random().nextInt(deck.size()));
+        return deck.remove(0);
     }
 }

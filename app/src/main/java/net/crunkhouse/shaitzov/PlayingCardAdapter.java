@@ -4,14 +4,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 
 class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
     private ArrayList<PlayingCard> cards;
     private boolean cardsFaceDown;
+    private CardSource source;
 
     public PlayingCardAdapter(ArrayList<PlayingCard> cards, CardSource source) {
         this.cards = cards;
+        this.source = source;
         if (source == CardSource.FACE_DOWN || source == CardSource.DECK) {
             cardsFaceDown = true;
         }
@@ -23,9 +27,17 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.view.setCard(cards.get(position));
         holder.view.setFaceDown(cardsFaceDown);
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    EventBus.getDefault().post(new CardClickedEvent(source, cards.get(holder.getAdapterPosition())));
+                }
+            }
+        });
     }
 
     @Override
