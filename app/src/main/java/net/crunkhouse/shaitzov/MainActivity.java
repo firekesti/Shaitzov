@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
         // Add the pile
-        pile.add(PlayingCardUtils.drawFrom(deck));
         pileView = (RecyclerView) findViewById(R.id.pile);
         pileAdapter = new PlayingCardAdapter(pile, PILE);
         pileView.setAdapter(pileAdapter);
@@ -97,37 +96,37 @@ public class MainActivity extends AppCompatActivity {
         switch (event.getSource()) {
             case HAND:
                 // Can only play from the hand if it's a valid card.
-                if (GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
+                if (playCardSuccessful(card)) {
                     playerHandAdapter.remove(card);
-                    pileAdapter.add(card);
-                    pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
-                } else {
-                    // Tell user they can't play that card right now.
-                    // TODO: snackbar it up?
-                    Toast.makeText(this, "You can't play a " + card.toString() + " on that pile", Toast.LENGTH_SHORT).show();
+                    // Now, if the user has less than 3 cards and there is still a deck,
+                    // one of two options...remind them to draw, or auto-draw for them.
+                    // Let's auto-draw for now.
+                    // TODO: make this a setting?
+                    if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
+                        //Toast.makeText(this, "You should draw more cards!", Toast.LENGTH_SHORT).show();
+                        onCardClicked(new CardClickedEvent(DECK, null));
+                    }
                 }
                 break;
             case DECK:
-                // If a deck card was clicked, we want to actually draw the top card
-                card = deckAdapter.getCards().get(deckAdapter.getItemCount() - 1);
-                deckAdapter.remove(card);
-                playerHandAdapter.add(card);
-                handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
-                // TODO: snackbar it up?
-                Toast.makeText(this, "You drew a " + card.toString(), Toast.LENGTH_SHORT).show();
+                // If a deck card was clicked, we want to actually draw the top card as long as our hand is less than 3
+                if (playerHandAdapter.getItemCount() < 3) {
+                    card = deckAdapter.getCards().get(deckAdapter.getItemCount() - 1);
+                    deckAdapter.remove(card);
+                    playerHandAdapter.add(card);
+                    handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
+                    // TODO: snackbar it up?
+                    Toast.makeText(this, "You drew a " + card.toString(), Toast.LENGTH_SHORT).show();
+                } else {
+                    // TODO: snackbar it up?
+                    Toast.makeText(this, "You can't draw more cards, you have 3 or more.", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case FACE_UP:
                 // Only do something if all player-hand cards are gone
                 if (playerHandAdapter.getItemCount() == 0) {
-                    if (GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
+                    if (playCardSuccessful(card)) {
                         faceUpAdapter.remove(card);
-                        pileAdapter.add(card);
-                        pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
-                    } else {
-                        // Tell user they can't play that card right now.
-                        // TODO: snackbar it up?
-                        Toast.makeText(this, "You can't play a " + card.toString() +
-                                " on a " + pileAdapter.getCards().get(0).toString(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     // Tell user they can't play that card right now.
@@ -138,10 +137,8 @@ public class MainActivity extends AppCompatActivity {
             case FACE_DOWN:
                 // Only do something if all face-up cards AND hand cards are gone
                 if (faceUpAdapter.getItemCount() == 0 && playerHandAdapter.getItemCount() == 0) {
-                    if (GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
+                    if (playCardSuccessful(card)) {
                         faceDownAdapter.remove(card);
-                        pileAdapter.add(card);
-                        pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
                     } else {
                         // Tell user they can't play that card right now.
                         // TODO: snackbar it up?
@@ -157,6 +154,32 @@ public class MainActivity extends AppCompatActivity {
                 pileAdapter.clear();
             default:
                 break;
+        }
+    }
+
+    private boolean playCardSuccessful(PlayingCard card) {
+        if (GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
+            pileAdapter.add(card);
+            pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
+
+            // Resolve special effects for 10, 4x, 7, 8
+            if (GameRuleUtils.shouldBurnPile(card, pileAdapter.getCards())) {
+                pileAdapter.clear();
+            } else if (GameRuleUtils.shouldDirectionSwitch(card)) {
+                if (currentDirection == PileDirection.DOWN) {
+                    currentDirection = PileDirection.UP;
+                } else {
+                    currentDirection = PileDirection.DOWN;
+                }
+            } else if (GameRuleUtils.shouldSkipPlayer(card)) {
+                // TODO: resolve special effects for 8 (doesn't matter for single player)
+            }
+            return true;
+        } else {
+            // Tell user they can't play that card right now.
+            // TODO: snackbar it up?
+            Toast.makeText(this, "You can't play a " + card.getValue() + " on that pile", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 

@@ -17,6 +17,10 @@ final class GameRuleUtils {
         if (value == 2 || value == 10 || value == 11) {
             return true;
         }
+        // If the pile is empty, ANYTHING can be played on it.
+        if (pile.size() == 0) {
+            return true;
+        }
         PlayingCard topPileCard = pile.get(pile.size() - 1);
         // Lower cards can be played on a J if the J is on top of a lower card.
         if (topPileCard.getValue() == 11) {
@@ -35,5 +39,26 @@ final class GameRuleUtils {
         } else {
             return value <= topPileCard.getValue();
         }
+    }
+
+    public static boolean shouldDirectionSwitch(PlayingCard card) {
+        return card.getValue() == 7;
+    }
+
+    public static boolean shouldSkipPlayer(PlayingCard card) {
+        return card.getValue() == 8;
+    }
+
+    public static boolean shouldBurnPile(PlayingCard card, ArrayList<PlayingCard> cards) {
+        // 10 always burns
+        if (card.getValue() == 10) {
+            return true;
+        }
+        // Then, check if we have 4 in a row on the pile including this card.
+        // TODO: WRITE A TEST FOR THIS (and others!!!)
+        return cards.size() >= 3
+                && cards.get(cards.size() - 1).getValue() == card.getValue()
+                && cards.get(cards.size() - 2).getValue() == card.getValue()
+                && cards.get(cards.size() - 3).getValue() == card.getValue();
     }
 }
