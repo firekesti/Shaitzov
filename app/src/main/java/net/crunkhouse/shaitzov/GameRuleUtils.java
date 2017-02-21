@@ -58,12 +58,13 @@ final class GameRuleUtils {
         if (card.getValue() == 10) {
             return true;
         }
-        // Then, check if we have 4 in a row on the pile including this card.
+        // Then, check if we have 4 in a row on the pile (the pile includes the active card).
         // TODO: WRITE A TEST FOR THIS (and others!!!)
-        return cards.size() >= 3
-                && cards.get(cards.size() - 1).getValue() == card.getValue()
+        return cards.size() >= 4
                 && cards.get(cards.size() - 2).getValue() == card.getValue()
-                && cards.get(cards.size() - 3).getValue() == card.getValue();
+                && cards.get(cards.size() - 3).getValue() == card.getValue()
+                && cards.get(cards.size() - 4).getValue() == card.getValue();
+    }
 
     public static boolean shouldDirectionReset(PlayingCard card) {
         return card.getValue() == 2;
