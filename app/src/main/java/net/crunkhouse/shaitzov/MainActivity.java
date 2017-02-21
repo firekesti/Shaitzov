@@ -140,10 +140,16 @@ public class MainActivity extends AppCompatActivity {
                     if (playCardSuccessful(card)) {
                         faceDownAdapter.remove(card);
                     } else {
-                        // Tell user they can't play that card right now.
-                        // TODO: snackbar it up?
-                        Toast.makeText(this, "You can't play a face-down card while you have a hand or face-up cards!", Toast.LENGTH_SHORT).show();
+                        // We still want to remove the card from face-down...
+                        // but now it goes to the hand, along with the pile!
+                        faceDownAdapter.remove(card);
+                        playerHandAdapter.add(card);
+                        onCardClicked(new CardClickedEvent(PILE, null));
                     }
+                } else {
+                    // Tell user they can't play that card right now.
+                    // TODO: snackbar it up?
+                    Toast.makeText(this, "You can't play a face-down card while you have a hand or face-up cards!", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case PILE:
