@@ -64,5 +64,8 @@ final class GameRuleUtils {
                 && cards.get(cards.size() - 1).getValue() == card.getValue()
                 && cards.get(cards.size() - 2).getValue() == card.getValue()
                 && cards.get(cards.size() - 3).getValue() == card.getValue();
+
+    public static boolean shouldDirectionReset(PlayingCard card) {
+        return card.getValue() == 2;
     }
 }

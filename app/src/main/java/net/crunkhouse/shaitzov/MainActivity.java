@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     currentDirection = PileDirection.DOWN;
                 }
+            } else if (GameRuleUtils.shouldDirectionReset(card)) {
+                currentDirection = PileDirection.UP;
             } else if (GameRuleUtils.shouldSkipPlayer(card)) {
                 // TODO: resolve special effects for 8 (doesn't matter for single player)
             }
