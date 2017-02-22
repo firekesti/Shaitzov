@@ -1,7 +1,9 @@
 package net.crunkhouse.shaitzov;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -162,8 +164,16 @@ public class MainActivity extends AppCompatActivity {
                 faceUpAdapter.getItemCount() == 0 &&
                 faceDownAdapter.getItemCount() == 0) {
             // This player is done with the game!!!
-            // TODO: new screen? popup?
-            snack("You won!");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
+            builder.setTitle("You won!");
+            builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // TODO: let them watch the game until it's finished, once we have multiplayer
+                    MainActivity.this.recreate();
+                }
+            });
+            builder.show();
         }
     }
 
