@@ -48,15 +48,15 @@ public class PlayingCard implements Comparable<PlayingCard> {
 
     @Override
     public String toString() {
-        return value + " of " + suit.toString().toLowerCase() + "s";
+        return getValueName() + " of " + suit.toString().toLowerCase() + "s";
     }
 
     /**
      * Returns 1 if otherCard is less than this card,
      * Returns 0 if they are the same value,
      * Returns -1 if otherCard is greater than this card
-     * @param otherCard
-     * @return
+     * @param otherCard the other card
+     * @return the comparator
      */
     @Override
     public int compareTo(@NonNull PlayingCard otherCard) {
