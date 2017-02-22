@@ -7,12 +7,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,22 +18,116 @@ import java.util.Collections;
 import static net.crunkhouse.shaitzov.CardSource.DECK;
 import static net.crunkhouse.shaitzov.CardSource.FACE_DOWN;
 import static net.crunkhouse.shaitzov.CardSource.FACE_UP;
+import static net.crunkhouse.shaitzov.CardSource.HAND;
 import static net.crunkhouse.shaitzov.CardSource.PILE;
 
 public class MainActivity extends AppCompatActivity {
     private static final int INITIAL_HAND_SIZE = 3;
     private static final int FACE_UP_AND_DOWN_CARD_AMOUNT = 3;
 
+    private boolean godmode = false;
+
     private PlayingCardAdapter playerHandAdapter;
     private PlayingCardAdapter pileAdapter;
     private PlayingCardAdapter deckAdapter;
     private PlayingCardAdapter faceDownAdapter;
     private PlayingCardAdapter faceUpAdapter;
-    private RecyclerView handView;
+    private RecyclerView playerHandView;
     private RecyclerView pileView;
     private PileDirection currentDirection = PileDirection.UP;
-
-    private boolean godmode = false;
+    private CardClickedListener cardClickedListener = new CardClickedListener() {
+        @Override
+        public boolean onCardClicked(CardSource source, PlayingCard card) {
+            boolean success = false;
+            switch (source) {
+                case HAND:
+                    // Can only play from the hand if it's a valid card.
+                    if (playCardSuccessful(card)) {
+                        playerHandAdapter.remove(card);
+                        // Now, if the user has less than 3 cards and there is still a deck,
+                        // one of two options...remind them to draw, or auto-draw for them.
+                        // Let's auto-draw for now.
+                        // TODO: make this a setting?
+                        if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
+//                        snack("You should draw more cards!");
+                            onCardClicked(DECK, null);
+                        }
+                        success = true;
+                    }
+                    break;
+                case DECK:
+                    // If a deck card was clicked, we want to actually draw the top card as long as our hand is less than 3
+                    if (godmode || playerHandAdapter.getItemCount() < 3) {
+                        card = deckAdapter.getCards().get(deckAdapter.getItemCount() - 1);
+                        deckAdapter.remove(card);
+                        playerHandAdapter.add(card);
+                        playerHandView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
+                        success = true;
+                        snack("You drew a " + card.toString());
+                    } else {
+                        snack("You can't draw more cards, you have 3 or more.");
+                    }
+                    break;
+                case FACE_UP:
+                    // Only do something if all player-hand cards are gone
+                    if (playerHandAdapter.getItemCount() == 0) {
+                        if (playCardSuccessful(card)) {
+                            faceUpAdapter.remove(card);
+                            success = true;
+                        }
+                    } else {
+                        // Tell user they can't play that card right now.
+                        snack("You can't play a face-up card while you have a hand!");
+                    }
+                    break;
+                case FACE_DOWN:
+                    // Only do something if all face-up cards AND hand cards are gone
+                    if (faceUpAdapter.getItemCount() == 0 && playerHandAdapter.getItemCount() == 0) {
+                        if (playCardSuccessful(card)) {
+                            faceDownAdapter.remove(card);
+                            success = true;
+                        } else {
+                            // We still want to remove the card from face-down...
+                            // but now it goes to the hand, along with the pile!
+                            faceDownAdapter.remove(card);
+                            playerHandAdapter.add(card);
+                            onCardClicked(PILE, null);
+                        }
+                    } else {
+                        // Tell user they can't play that card right now.
+                        snack("You can't play a face-down card while you have a hand or face-up cards!");
+                    }
+                    break;
+                case PILE:
+                    // take all cards from pile, put in hand
+                    ArrayList<PlayingCard> cards = pileAdapter.getCards();
+                    playerHandAdapter.addAll(cards);
+                    playerHandView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
+                    pileAdapter.clear();
+                    currentDirection = PileDirection.UP;
+                    success = true;
+                default:
+                    break;
+            }
+            if (playerHandAdapter.getItemCount() == 0 &&
+                    faceUpAdapter.getItemCount() == 0 &&
+                    faceDownAdapter.getItemCount() == 0) {
+                // This player is done with the game!!!
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogStyle);
+                builder.setTitle("You won!");
+                builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // TODO: let them watch the game until it's finished, once we have multiplayer
+                        MainActivity.this.recreate();
+                    }
+                });
+                builder.show();
+                success = true;
+            }
+            return success;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceDown.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
-        faceDownAdapter = new PlayingCardAdapter(playerFaceDown, FACE_DOWN);
+        faceDownAdapter = new PlayingCardAdapter(playerFaceDown, FACE_DOWN, cardClickedListener);
         faceDownView.setAdapter(faceDownAdapter);
         faceDownView.addItemDecoration(new CardSpacingDecorator(faceDownView.getContext()));
         faceDownView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -66,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceUpView = (RecyclerView) findViewById(R.id.player_faceup);
-        faceUpAdapter = new PlayingCardAdapter(playerFaceUp, FACE_UP);
+        faceUpAdapter = new PlayingCardAdapter(playerFaceUp, FACE_UP, cardClickedListener);
         faceUpView.setAdapter(faceUpAdapter);
         faceUpView.addItemDecoration(new CardSpacingDecorator(faceUpView.getContext()));
         faceUpView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -76,25 +168,33 @@ public class MainActivity extends AppCompatActivity {
             playerHand.add(PlayingCardUtils.drawFrom(deck));
         }
         Collections.sort(playerHand);
-        handView = (RecyclerView) findViewById(R.id.player_hand);
-        playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND);
-        handView.setAdapter(playerHandAdapter);
-        handView.addItemDecoration(new HandOverlapDecorator(handView.getContext()));
-        handView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        playerHandView = (RecyclerView) findViewById(R.id.player_hand);
+        playerHandAdapter = new PlayingCardAdapter(playerHand, HAND, cardClickedListener);
+        playerHandView.setAdapter(playerHandAdapter);
+        playerHandView.addItemDecoration(new HandOverlapDecorator(playerHandView.getContext()));
+        playerHandView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Add the deck
         RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
-        deckAdapter = new PlayingCardAdapter(deck, DECK);
+        deckAdapter = new PlayingCardAdapter(deck, DECK, cardClickedListener);
         deckView.setAdapter(deckAdapter);
         deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
         // Add the pile
         pileView = (RecyclerView) findViewById(R.id.pile);
-        pileAdapter = new PlayingCardAdapter(pile, PILE);
+        pileAdapter = new PlayingCardAdapter(pile, PILE, cardClickedListener);
         pileView.setAdapter(pileAdapter);
         pileView.addItemDecoration(new PileOverlapDecorator(pileView.getContext()));
         pileView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        // Ass swipe-to-play support
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(faceDownAdapter));
+        itemTouchHelper.attachToRecyclerView(faceDownView);
+        itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(faceUpAdapter));
+        itemTouchHelper.attachToRecyclerView(faceUpView);
+        itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(playerHandAdapter));
+        itemTouchHelper.attachToRecyclerView(playerHandView);
     }
 
     @Override
@@ -126,91 +226,6 @@ public class MainActivity extends AppCompatActivity {
 //        return super.onOptionsItemSelected(item);
 //    }
 
-    @Subscribe
-    public void onCardClicked(CardClickedEvent event) {
-        PlayingCard card = event.getCard();
-        switch (event.getSource()) {
-            case HAND:
-                // Can only play from the hand if it's a valid card.
-                if (playCardSuccessful(card)) {
-                    playerHandAdapter.remove(card);
-                    // Now, if the user has less than 3 cards and there is still a deck,
-                    // one of two options...remind them to draw, or auto-draw for them.
-                    // Let's auto-draw for now.
-                    // TODO: make this a setting?
-                    if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
-//                        snack("You should draw more cards!");
-                        onCardClicked(new CardClickedEvent(DECK, null));
-                    }
-                }
-                break;
-            case DECK:
-                // If a deck card was clicked, we want to actually draw the top card as long as our hand is less than 3
-                if (playerHandAdapter.getItemCount() < 3) {
-                    card = deckAdapter.getCards().get(deckAdapter.getItemCount() - 1);
-                    deckAdapter.remove(card);
-                    playerHandAdapter.add(card);
-                    handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
-                    snack("You drew a " + card.toString());
-                } else {
-                    snack("You can't draw more cards, you have 3 or more.");
-                }
-                break;
-            case FACE_UP:
-                // Only do something if all player-hand cards are gone
-                if (playerHandAdapter.getItemCount() == 0) {
-                    if (playCardSuccessful(card)) {
-                        faceUpAdapter.remove(card);
-                    }
-                } else {
-                    // Tell user they can't play that card right now.
-                    snack("You can't play a face-up card while you have a hand!");
-                }
-                break;
-            case FACE_DOWN:
-                // Only do something if all face-up cards AND hand cards are gone
-                if (faceUpAdapter.getItemCount() == 0 && playerHandAdapter.getItemCount() == 0) {
-                    if (playCardSuccessful(card)) {
-                        faceDownAdapter.remove(card);
-                    } else {
-                        // We still want to remove the card from face-down...
-                        // but now it goes to the hand, along with the pile!
-                        faceDownAdapter.remove(card);
-                        playerHandAdapter.add(card);
-                        onCardClicked(new CardClickedEvent(PILE, null));
-                    }
-                } else {
-                    // Tell user they can't play that card right now.
-                    snack("You can't play a face-down card while you have a hand or face-up cards!");
-                }
-                break;
-            case PILE:
-                // take all cards from pile, put in hand
-                ArrayList<PlayingCard> cards = pileAdapter.getCards();
-                playerHandAdapter.addAll(cards);
-                handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
-                pileAdapter.clear();
-                currentDirection = PileDirection.UP;
-            default:
-                break;
-        }
-        if (playerHandAdapter.getItemCount() == 0 &&
-                faceUpAdapter.getItemCount() == 0 &&
-                faceDownAdapter.getItemCount() == 0) {
-            // This player is done with the game!!!
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-            builder.setTitle("You won!");
-            builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // TODO: let them watch the game until it's finished, once we have multiplayer
-                    MainActivity.this.recreate();
-                }
-            });
-            builder.show();
-        }
-    }
-
     private boolean playCardSuccessful(PlayingCard card) {
         if (godmode || GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
             pileAdapter.add(card);
@@ -237,18 +252,6 @@ public class MainActivity extends AppCompatActivity {
             snack("You can't play a " + card.getValueName() + " on that pile");
             return false;
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     private void snack(String text) {

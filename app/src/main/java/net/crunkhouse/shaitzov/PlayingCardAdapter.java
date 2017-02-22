@@ -4,8 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -13,13 +11,16 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     private ArrayList<PlayingCard> cards;
     private boolean cardsFaceDown;
     private CardSource source;
+    private CardClickedListener listener;
+    private ArrayList<PlayingCard> activeCards = new ArrayList<>(4);
 
-    public PlayingCardAdapter(ArrayList<PlayingCard> cards, CardSource source) {
+    public PlayingCardAdapter(ArrayList<PlayingCard> cards, CardSource source, CardClickedListener listener) {
         this.cards = cards;
         this.source = source;
         if (source == CardSource.FACE_DOWN || source == CardSource.DECK) {
             cardsFaceDown = true;
         }
+        this.listener = listener;
     }
 
     @Override
@@ -29,13 +30,45 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        holder.view.setSelected(activeCards.contains(cards.get(position)));
         holder.view.setCard(cards.get(position));
         holder.view.setFaceDown(cardsFaceDown);
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
-                    EventBus.getDefault().post(new CardClickedEvent(source, cards.get(holder.getAdapterPosition())));
+                    PlayingCard currentCard = cards.get(holder.getAdapterPosition());
+
+                    // If this is the DECK or PILE or FACE-DOWN, proceed with single-select:
+                    if (source == CardSource.DECK || source == CardSource.PILE || source == CardSource.FACE_DOWN) {
+                        listener.onCardClicked(source, currentCard);
+                        return;
+                    }
+
+                    // Check to see if the current card has any sibling cards (of the same value)
+                    int countOfEqualValueCards = 0;
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).getValue() == currentCard.getValue()) {
+                            countOfEqualValueCards++;
+                        }
+                    }
+                    // If we only have the one card, proceed with single-select.
+                    if (countOfEqualValueCards == 1) {
+                        listener.onCardClicked(source, currentCard);
+                        return;
+                    }
+
+                    // If we have no active cards, or if we do but the values match and it's not the same card:
+                    if (activeCards.size() == 0 ||
+                            (activeCards.size() > 0 && activeCards.get(0).getValue() == currentCard.getValue() &&
+                                    !activeCards.contains(currentCard))) {
+                        holder.view.setSelected(true);
+                        activeCards.add(currentCard);
+                    } else if (holder.view.isSelected()) {
+                        // Otherwise, if we're already selected, unselect and remove from active cards
+                        holder.view.setSelected(false);
+                        activeCards.remove(currentCard);
+                    }
                 }
             }
         });
@@ -94,6 +127,35 @@ class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHol
     public void clear() {
         notifyItemRangeRemoved(0, cards.size());
         cards.clear();
+    }
+
+    public void cardSwipedAtPosition(int adapterPosition) {
+        PlayingCard swipedCard = cards.get(adapterPosition);
+        if (activeCards.size() == 0) {
+            // If there are no selected cards, the user just wants to swipe one to play it, so play it:
+            if (!listener.onCardClicked(source, swipedCard)) {
+                // If we didn't play it successfully, reset swipe offset
+                notifyItemChanged(adapterPosition);
+            }
+        } else {
+            // If the adapter-position item wasn't one of the active cards, don't play it
+            if (!activeCards.contains(swipedCard)) {
+                notifyItemChanged(adapterPosition);
+            } else {
+                boolean success = false;
+                // For each selected card, try to play it - if one is successful, they all are
+                for (PlayingCard card : activeCards) {
+                    if (listener.onCardClicked(source, card)) {
+                        success = true;
+                    }
+                }
+                if (!success) {
+                    // If it wasn't successful, reset swipe offset and selected-ness for all cards
+                    notifyDataSetChanged();
+                }
+            }
+            activeCards.clear();
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
