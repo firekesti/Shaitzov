@@ -2,11 +2,15 @@
 <resources>
     <color name="colorPrimary">@color/deep_orange</color>
     <color name="colorPrimaryDark">@color/deep_orange_dark</color>
-    <color name="colorAccent">@color/deep_orange_dark</color>
+    <color name="colorAccent">@color/golden_yellow</color>
+
+    <!-- Specific colored things -->
     <color name="table">@color/nutmeg_wood</color>
+    <color name="card_back">@color/deep_orange</color>
 
     <!-- Real Color Names -->
     <color name="deep_orange">#FF5722</color>
     <color name="deep_orange_dark">#E64A19</color>
     <color name="nutmeg_wood">#663300</color>
+    <color name="golden_yellow">#FFD900</color>
 </resources>
