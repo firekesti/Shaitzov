@@ -48,7 +48,7 @@ public class PlayingCard implements Comparable<PlayingCard> {
 
     @Override
     public String toString() {
-        return value + " of " + suit;
+        return value + " of " + suit.toString().toLowerCase() + "s";
     }
 
     /**

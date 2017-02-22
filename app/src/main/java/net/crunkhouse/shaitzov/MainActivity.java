@@ -158,6 +158,13 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
+        if (playerHandAdapter.getItemCount() == 0 &&
+                faceUpAdapter.getItemCount() == 0 &&
+                faceDownAdapter.getItemCount() == 0) {
+            // This player is done with the game!!!
+            // TODO: new screen? popup?
+            snack("You won!");
+        }
     }
 
     private boolean playCardSuccessful(PlayingCard card) {
