@@ -1,10 +1,10 @@
 package net.crunkhouse.shaitzov;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     // Let's auto-draw for now.
                     // TODO: make this a setting?
                     if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
-                        //Toast.makeText(this, "You should draw more cards!", Toast.LENGTH_SHORT).show();
+                        snack("You should draw more cards!");
                         onCardClicked(new CardClickedEvent(DECK, null));
                     }
                 }
@@ -115,11 +115,9 @@ public class MainActivity extends AppCompatActivity {
                     deckAdapter.remove(card);
                     playerHandAdapter.add(card);
                     handView.scrollToPosition(playerHandAdapter.getItemCount() - 1);
-                    // TODO: snackbar it up?
-                    Toast.makeText(this, "You drew a " + card.toString(), Toast.LENGTH_SHORT).show();
+                    snack("You drew a " + card.toString());
                 } else {
-                    // TODO: snackbar it up?
-                    Toast.makeText(this, "You can't draw more cards, you have 3 or more.", Toast.LENGTH_SHORT).show();
+                    snack("You can't draw more cards, you have 3 or more.");
                 }
                 break;
             case FACE_UP:
@@ -130,8 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     // Tell user they can't play that card right now.
-                    // TODO: snackbar it up?
-                    Toast.makeText(this, "You can't play a face-up card while you have a hand!", Toast.LENGTH_SHORT).show();
+                    snack("You can't play a face-up card while you have a hand!");
                 }
                 break;
             case FACE_DOWN:
@@ -148,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     // Tell user they can't play that card right now.
-                    // TODO: snackbar it up?
-                    Toast.makeText(this, "You can't play a face-down card while you have a hand or face-up cards!", Toast.LENGTH_SHORT).show();
+                    snack("You can't play a face-down card while you have a hand or face-up cards!");
                 }
                 break;
             case PILE:
@@ -187,8 +183,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else {
             // Tell user they can't play that card right now.
-            // TODO: snackbar it up?
-            Toast.makeText(this, "You can't play a " + card.getValueName() + " on that pile", Toast.LENGTH_SHORT).show();
+            snack("You can't play a " + card.getValueName() + " on that pile");
             return false;
         }
     }
@@ -203,5 +198,9 @@ public class MainActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    private void snack(String text) {
+        Snackbar.make(findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
     }
 }
