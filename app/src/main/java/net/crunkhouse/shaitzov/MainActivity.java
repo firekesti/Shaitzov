@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView pileView;
     private PileDirection currentDirection = PileDirection.UP;
 
+    private boolean godmode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        Switch godmode = (Switch) menu.findItem(R.id.action_godmode).getActionView().findViewById(R.id.action_switch);
-        godmode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Switch godSwitch = (Switch) menu.findItem(R.id.action_godmode).getActionView().findViewById(R.id.action_switch);
+        godSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    snack("enable godmode!");
+                    godmode = true;
                 } else {
-                    snack("disable godmode!");
+                    godmode = false;
                 }
             }
         });
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     // Let's auto-draw for now.
                     // TODO: make this a setting?
                     if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
-                        snack("You should draw more cards!");
+//                        snack("You should draw more cards!");
                         onCardClicked(new CardClickedEvent(DECK, null));
                     }
                 }
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean playCardSuccessful(PlayingCard card) {
-        if (GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
+        if (godmode || GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {
             pileAdapter.add(card);
             pileView.scrollToPosition(pileAdapter.getItemCount() - 1);
 
