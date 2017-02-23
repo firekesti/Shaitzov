@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.ui;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -7,7 +7,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Enable calling a method when a card is swiped
  */
 
-class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
+public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     private PlayingCardAdapter adapter;
 
     public SimpleItemTouchHelperCallback(PlayingCardAdapter adapter) {

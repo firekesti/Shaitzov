@@ -1,9 +1,11 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.ui;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import net.crunkhouse.shaitzov.DensityUtils;
 
 /**
  * An ItemDecorator that adds some space between cards.

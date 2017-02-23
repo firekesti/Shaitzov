@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
 import java.util.ArrayList;
 
@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * A util class to encompass some game logic.
  */
 
-final class GameRuleUtils {
+public final class GameRuleUtils {
     private GameRuleUtils() {
     }
 

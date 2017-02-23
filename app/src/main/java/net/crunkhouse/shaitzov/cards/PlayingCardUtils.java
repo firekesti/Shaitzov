@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,13 +7,13 @@ import java.util.Collections;
  * Utilities for card-related functions.
  */
 
-final class PlayingCardUtils {
+public final class PlayingCardUtils {
     private static final int DECK_SIZE = 52;
 
     private PlayingCardUtils() {
     }
 
-    static ArrayList<PlayingCard> makeDeck() {
+    public static ArrayList<PlayingCard> makeDeck() {
         ArrayList<PlayingCard> deck = new ArrayList<>(DECK_SIZE);
 
         PlayingCard.Suit suit;
@@ -44,7 +44,7 @@ final class PlayingCardUtils {
         return deck;
     }
 
-    static PlayingCard drawFrom(ArrayList<PlayingCard> deck) {
+    public static PlayingCard drawFrom(ArrayList<PlayingCard> deck) {
         return deck.remove(0);
     }
 }

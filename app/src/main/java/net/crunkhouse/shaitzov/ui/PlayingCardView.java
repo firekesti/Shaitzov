@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -8,6 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import net.crunkhouse.shaitzov.DensityUtils;
+import net.crunkhouse.shaitzov.R;
+import net.crunkhouse.shaitzov.cards.PlayingCard;
 
 /**
  * A view that draws a PlayingCard model to an image.

@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
 /**
  * A list of places a card can exist.

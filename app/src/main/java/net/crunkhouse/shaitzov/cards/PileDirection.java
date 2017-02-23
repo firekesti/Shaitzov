@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
 /**
  * Whether new cards should be greater (UP) or less than (DOWN) the top card on the pile

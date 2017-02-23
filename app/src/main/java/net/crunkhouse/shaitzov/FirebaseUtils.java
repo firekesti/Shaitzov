@@ -3,6 +3,8 @@ package net.crunkhouse.shaitzov;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import net.crunkhouse.shaitzov.cards.PlayingCard;
+
 import java.util.ArrayList;
 
 /**

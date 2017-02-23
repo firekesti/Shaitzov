@@ -1,13 +1,17 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.ui;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.crunkhouse.shaitzov.cards.CardClickedListener;
+import net.crunkhouse.shaitzov.cards.CardSource;
+import net.crunkhouse.shaitzov.cards.PlayingCard;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
-class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
+public class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.ViewHolder> {
     private ArrayList<PlayingCard> cards;
     private boolean cardsFaceDown;
     private CardSource source;

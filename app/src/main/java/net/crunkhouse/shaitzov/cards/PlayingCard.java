@@ -1,4 +1,4 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
 import android.support.annotation.NonNull;
 

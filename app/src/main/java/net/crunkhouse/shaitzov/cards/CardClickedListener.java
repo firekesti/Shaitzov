@@ -1,6 +1,6 @@
-package net.crunkhouse.shaitzov;
+package net.crunkhouse.shaitzov.cards;
 
-interface CardClickedListener {
+public interface CardClickedListener {
     /**
      * Return true if successfully played, false if not
      */
