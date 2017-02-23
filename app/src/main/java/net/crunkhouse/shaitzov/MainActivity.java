@@ -189,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(faceUpView);
         itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(playerHandAdapter));
         itemTouchHelper.attachToRecyclerView(playerHandView);
+
+        // Write a message to the database
+        FirebaseUtils.syncCards(deck, pile, playerHand, playerFaceUp, playerFaceDown);
     }
 
     @Override

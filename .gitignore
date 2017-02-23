@@ -7,3 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+
+# Secret API key is contained here, don't check it in.
+app/google-services.json
