@@ -23,11 +23,11 @@ public final class FirebaseUtils {
     private FirebaseUtils() {
     }
 
-    public static void syncCards(ArrayList<PlayingCard> deck,
-                                 ArrayList<PlayingCard> pile,
-                                 ArrayList<PlayingCard> playerHand,
-                                 ArrayList<PlayingCard> playerFaceUp,
-                                 ArrayList<PlayingCard> playerFaceDown) {
+    public static void putCards(ArrayList<PlayingCard> deck,
+                                ArrayList<PlayingCard> pile,
+                                ArrayList<PlayingCard> playerHand,
+                                ArrayList<PlayingCard> playerFaceUp,
+                                ArrayList<PlayingCard> playerFaceDown) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);

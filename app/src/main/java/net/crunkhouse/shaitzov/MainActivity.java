@@ -149,46 +149,49 @@ public class MainActivity extends AppCompatActivity {
 
         // Populate deck
         ArrayList<PlayingCard> deck = PlayingCardUtils.makeDeck();
-
         // Add player face-down cards
         for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
             playerFaceDown.add(PlayingCardUtils.drawFrom(deck));
         }
+        // Add player face-up cards
+        for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
+            playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
+        }
+        // Add player hand
+        for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
+            playerHand.add(PlayingCardUtils.drawFrom(deck));
+        }
+        Collections.sort(playerHand);
+
+        // Set up face-down view
         RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
         faceDownAdapter = new PlayingCardAdapter(playerFaceDown, CardSource.FACE_DOWN, cardClickedListener);
         faceDownView.setAdapter(faceDownAdapter);
         faceDownView.addItemDecoration(new CardSpacingDecorator(faceDownView.getContext()));
         faceDownView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Add player face-up cards
-        for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
-            playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
-        }
+        // Set up face-down view
         RecyclerView faceUpView = (RecyclerView) findViewById(R.id.player_faceup);
         faceUpAdapter = new PlayingCardAdapter(playerFaceUp, CardSource.FACE_UP, cardClickedListener);
         faceUpView.setAdapter(faceUpAdapter);
         faceUpView.addItemDecoration(new CardSpacingDecorator(faceUpView.getContext()));
         faceUpView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Add player hand
-        for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
-            playerHand.add(PlayingCardUtils.drawFrom(deck));
-        }
-        Collections.sort(playerHand);
+        // Set up player hand view
         playerHandView = (RecyclerView) findViewById(R.id.player_hand);
         playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND, cardClickedListener);
         playerHandView.setAdapter(playerHandAdapter);
         playerHandView.addItemDecoration(new HandOverlapDecorator(playerHandView.getContext()));
         playerHandView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Add the deck
+        // Set up deck view
         RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
         deckAdapter = new PlayingCardAdapter(deck, CardSource.DECK, cardClickedListener);
         deckView.setAdapter(deckAdapter);
         deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
-        // Add the pile
+        // Set up pile view
         pileView = (RecyclerView) findViewById(R.id.pile);
         pileAdapter = new PlayingCardAdapter(pile, CardSource.PILE, cardClickedListener);
         pileView.setAdapter(pileAdapter);
@@ -204,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(playerHandView);
 
         // Write a message to the database
-        FirebaseUtils.syncCards(deck, pile, playerHand, playerFaceUp, playerFaceDown);
+        FirebaseUtils.putCards(deck, pile, playerHand, playerFaceUp, playerFaceDown);
     }
 
     @Override
