@@ -2,10 +2,13 @@ package net.crunkhouse.shaitzov.cards;
 
 import android.support.annotation.NonNull;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
 /**
  * A model for a playing card.
  */
-
+@IgnoreExtraProperties
 public class PlayingCard implements Comparable<PlayingCard> {
 
     public enum Suit {
@@ -14,6 +17,10 @@ public class PlayingCard implements Comparable<PlayingCard> {
 
     private int value;
     private Suit suit;
+
+    public PlayingCard() {
+        // Default constructor required for calls to DataSnapshot.getValue(PlayingCard.class)
+    }
 
     public PlayingCard(int value, Suit suit) {
         if (value < 2 || value > 14) {
@@ -27,6 +34,7 @@ public class PlayingCard implements Comparable<PlayingCard> {
         return value;
     }
 
+    @Exclude
     public String getValueName() {
         switch (value) {
             case 11:

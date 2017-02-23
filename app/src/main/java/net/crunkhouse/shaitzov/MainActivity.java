@@ -26,7 +26,6 @@ import net.crunkhouse.shaitzov.ui.PlayingCardAdapter;
 import net.crunkhouse.shaitzov.ui.SimpleItemTouchHelperCallback;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     private static final int INITIAL_HAND_SIZE = 3;
@@ -146,9 +145,10 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<PlayingCard> playerFaceDown = new ArrayList<>(FACE_UP_AND_DOWN_CARD_AMOUNT);
         ArrayList<PlayingCard> playerFaceUp = new ArrayList<>(FACE_UP_AND_DOWN_CARD_AMOUNT);
         ArrayList<PlayingCard> pile = new ArrayList<>(0);
+        ArrayList<PlayingCard> deck;
 
         // Populate deck
-        ArrayList<PlayingCard> deck = PlayingCardUtils.makeDeck();
+        deck = PlayingCardUtils.makeDeck();
         // Add player face-down cards
         for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
             playerFaceDown.add(PlayingCardUtils.drawFrom(deck));
@@ -157,11 +157,11 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
             playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
         }
-        // Add player hand
-        for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
-            playerHand.add(PlayingCardUtils.drawFrom(deck));
-        }
-        Collections.sort(playerHand);
+//        // Add player hand
+//        for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
+//            playerHand.add(PlayingCardUtils.drawFrom(deck));
+//        }
+//        Collections.sort(playerHand);
 
         // Set up face-down view
         RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         playerHandView.setAdapter(playerHandAdapter);
         playerHandView.addItemDecoration(new HandOverlapDecorator(playerHandView.getContext()));
         playerHandView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        FirebaseUtils.getHand(playerHandAdapter);
 
         // Set up deck view
         RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(playerHandView);
 
         // Write a message to the database
-        FirebaseUtils.putCards(deck, pile, playerHand, playerFaceUp, playerFaceDown);
+//        FirebaseUtils.putCards(deck, pile, playerHand, playerFaceUp, playerFaceDown);
     }
 
     @Override

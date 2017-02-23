@@ -1,9 +1,13 @@
 package net.crunkhouse.shaitzov;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import net.crunkhouse.shaitzov.cards.PlayingCard;
+import net.crunkhouse.shaitzov.ui.PlayingCardAdapter;
 
 import java.util.ArrayList;
 
@@ -43,5 +47,24 @@ public final class FirebaseUtils {
         dbFaceUp.setValue(playerFaceUp);
         DatabaseReference dbFaceDown = dbCurrentPlayer.child(DB_KEY_FACE_DOWN);
         dbFaceDown.setValue(playerFaceDown);
+    }
+
+    public static void getHand(final PlayingCardAdapter playerHandAdapter) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbCurrentPlayer = database.getReference("Player1");
+        DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
+        dbHand.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    playerHandAdapter.add(card.getValue(PlayingCard.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
