@@ -15,12 +15,6 @@ import android.widget.Switch;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static net.crunkhouse.shaitzov.CardSource.DECK;
-import static net.crunkhouse.shaitzov.CardSource.FACE_DOWN;
-import static net.crunkhouse.shaitzov.CardSource.FACE_UP;
-import static net.crunkhouse.shaitzov.CardSource.HAND;
-import static net.crunkhouse.shaitzov.CardSource.PILE;
-
 public class MainActivity extends AppCompatActivity {
     private static final int INITIAL_HAND_SIZE = 3;
     private static final int FACE_UP_AND_DOWN_CARD_AMOUNT = 3;
@@ -50,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                         // TODO: make this a setting?
                         if (deckAdapter.getItemCount() > 0 && playerHandAdapter.getItemCount() < 3) {
 //                        snack("You should draw more cards!");
-                            onCardClicked(DECK, null);
+                            onCardClicked(CardSource.DECK, null);
                         }
                         success = true;
                     }
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                             // but now it goes to the hand, along with the pile!
                             faceDownAdapter.remove(card);
                             playerHandAdapter.add(card);
-                            onCardClicked(PILE, null);
+                            onCardClicked(CardSource.PILE, null);
                         }
                     } else {
                         // Tell user they can't play that card right now.
@@ -148,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceDown.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
-        faceDownAdapter = new PlayingCardAdapter(playerFaceDown, FACE_DOWN, cardClickedListener);
+        faceDownAdapter = new PlayingCardAdapter(playerFaceDown, CardSource.FACE_DOWN, cardClickedListener);
         faceDownView.setAdapter(faceDownAdapter);
         faceDownView.addItemDecoration(new CardSpacingDecorator(faceDownView.getContext()));
         faceDownView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -158,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             playerFaceUp.add(PlayingCardUtils.drawFrom(deck));
         }
         RecyclerView faceUpView = (RecyclerView) findViewById(R.id.player_faceup);
-        faceUpAdapter = new PlayingCardAdapter(playerFaceUp, FACE_UP, cardClickedListener);
+        faceUpAdapter = new PlayingCardAdapter(playerFaceUp, CardSource.FACE_UP, cardClickedListener);
         faceUpView.setAdapter(faceUpAdapter);
         faceUpView.addItemDecoration(new CardSpacingDecorator(faceUpView.getContext()));
         faceUpView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -169,26 +163,26 @@ public class MainActivity extends AppCompatActivity {
         }
         Collections.sort(playerHand);
         playerHandView = (RecyclerView) findViewById(R.id.player_hand);
-        playerHandAdapter = new PlayingCardAdapter(playerHand, HAND, cardClickedListener);
+        playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND, cardClickedListener);
         playerHandView.setAdapter(playerHandAdapter);
         playerHandView.addItemDecoration(new HandOverlapDecorator(playerHandView.getContext()));
         playerHandView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Add the deck
         RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
-        deckAdapter = new PlayingCardAdapter(deck, DECK, cardClickedListener);
+        deckAdapter = new PlayingCardAdapter(deck, CardSource.DECK, cardClickedListener);
         deckView.setAdapter(deckAdapter);
         deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
         // Add the pile
         pileView = (RecyclerView) findViewById(R.id.pile);
-        pileAdapter = new PlayingCardAdapter(pile, PILE, cardClickedListener);
+        pileAdapter = new PlayingCardAdapter(pile, CardSource.PILE, cardClickedListener);
         pileView.setAdapter(pileAdapter);
         pileView.addItemDecoration(new PileOverlapDecorator(pileView.getContext()));
         pileView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Ass swipe-to-play support
+        // Add swipe-to-play support
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(faceDownAdapter));
         itemTouchHelper.attachToRecyclerView(faceDownView);
         itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(faceUpAdapter));
