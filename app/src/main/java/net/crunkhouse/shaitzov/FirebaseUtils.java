@@ -181,6 +181,10 @@ public final class FirebaseUtils {
         });
     }
 
+    public static void clearGame() {
+        putCards(null, null, null, null, null);
+    }
+
     interface ResultListener {
         void onResult(boolean success);
     }

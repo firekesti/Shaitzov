@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        FirebaseUtils.clearGame();
                         // TODO: let them watch the game until it's finished, once we have multiplayer
                         MainActivity.this.recreate();
                     }
