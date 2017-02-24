@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/part_one"
+        style="@style/welcome_card">
+
+        <TextView
+            android:text="@string/welcome_to_shaitzov"
+            style="@style/welcome_text"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:hint="@string/nickname"
+                android:inputType="textPersonName"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:text="@string/continue_string"
+            style="@style/welcome_button"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/part_two"
+        android:visibility="gone"
+        style="@style/welcome_card">
+
+        <TextView
+            android:text="@string/thanks_what_game"
+            style="@style/welcome_text"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:hint="@string/game_id"
+                android:inputType="number"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:text="@string/lets_go"
+            style="@style/welcome_button"/>
+    </LinearLayout>
+</FrameLayout>

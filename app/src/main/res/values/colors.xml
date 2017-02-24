@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/deep_orange</color>
-    <color name="colorPrimaryDark">@color/deep_orange_dark</color>
-    <color name="colorAccent">@color/golden_yellow</color>
+    <color name="colorPrimary">@color/walnut_wood</color>
+    <color name="colorPrimaryDark">@color/americano</color>
+    <color name="colorAccent">@color/latte</color>
 
     <!-- Specific colored things -->
-    <color name="table">@color/nutmeg_wood</color>
-    <color name="card_back">@color/deep_orange</color>
+    <color name="table">@color/walnut_wood</color>
+    <color name="card_back">@color/cherry</color>
+
+    <!-- Welcome screen-->
+    <color name="text_color">@color/americano</color>
+    <color name="background_color">@color/cappuccino</color>
+    <color name="button_color">@color/cherry</color>
+    <color name="button_text_color">@color/foam</color>
 
     <!-- Real Color Names -->
-    <color name="deep_orange">#FF5722</color>
-    <color name="deep_orange_dark">#E64A19</color>
-    <color name="nutmeg_wood">#663300</color>
-    <color name="golden_yellow">#FFD900</color>
+    <color name="americano">#241b12</color>
+    <color name="walnut_wood">#5a3926</color>
+    <color name="latte">#a37f5b</color>
+    <color name="cappuccino">#e0ccbe</color>
+    <color name="foam">#ffeeee</color>
+    <color name="cherry">#870f11</color>
 </resources>
