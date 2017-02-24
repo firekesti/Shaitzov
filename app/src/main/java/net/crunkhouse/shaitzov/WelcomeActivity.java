@@ -18,6 +18,8 @@ import android.widget.TextView;
  */
 
 public class WelcomeActivity extends AppCompatActivity {
+    private static final int FADE_DURATION = 250;
+
     private EditText nicknameView;
     private TextInputLayout nicknameLayout;
 
@@ -26,6 +28,8 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         nicknameView = (EditText) findViewById(R.id.nickname);
+        // If the user has a previous nickname, prepopulate it:
+        nicknameView.setText(LocalPreferences.getInstance().getPlayerNickname());
         nicknameLayout = (TextInputLayout) findViewById(R.id.nickname_layout);
         nicknameView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -54,14 +58,14 @@ public class WelcomeActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.thanks_what_game)).setText(text);
 
             ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.part_one), View.ALPHA, 1f, 0f);
-            animator.setDuration(400);
+            animator.setDuration(FADE_DURATION);
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     findViewById(R.id.part_one).setVisibility(View.GONE);
                     findViewById(R.id.part_two).setVisibility(View.VISIBLE);
                     ObjectAnimator.ofFloat(findViewById(R.id.part_two), View.ALPHA, 0f, 1f)
-                            .setDuration(400)
+                            .setDuration(FADE_DURATION)
                             .start();
                 }
             });
@@ -82,14 +86,14 @@ public class WelcomeActivity extends AppCompatActivity {
         if (findViewById(R.id.part_two).getVisibility() == View.VISIBLE) {
             // Go back to part one
             ObjectAnimator animator = ObjectAnimator.ofFloat(findViewById(R.id.part_two), View.ALPHA, 1f, 0f);
-            animator.setDuration(400);
+            animator.setDuration(FADE_DURATION);
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     findViewById(R.id.part_two).setVisibility(View.GONE);
                     findViewById(R.id.part_one).setVisibility(View.VISIBLE);
                     ObjectAnimator.ofFloat(findViewById(R.id.part_one), View.ALPHA, 0f, 1f)
-                            .setDuration(400)
+                            .setDuration(FADE_DURATION)
                             .start();
                 }
             });
