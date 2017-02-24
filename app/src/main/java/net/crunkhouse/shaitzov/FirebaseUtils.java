@@ -32,25 +32,106 @@ public final class FirebaseUtils {
                                 ArrayList<PlayingCard> playerHand,
                                 ArrayList<PlayingCard> playerFaceUp,
                                 ArrayList<PlayingCard> playerFaceDown) {
+        putDeck(deck);
+        putPile(pile);
+        putPlayerHand(playerHand);
+        putPlayerFaceUp(playerFaceUp);
+        putPlayerFaceDown(playerFaceDown);
+    }
+
+    public static void putPlayerFaceDown(ArrayList<PlayingCard> playerFaceDown) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
-        dbDeck.setValue(deck);
-        DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
-        dbPile.setValue(pile);
-
         DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
-        DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
-        dbHand.setValue(playerHand);
-        DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
-        dbFaceUp.setValue(playerFaceUp);
         DatabaseReference dbFaceDown = dbCurrentPlayer.child(DB_KEY_FACE_DOWN);
         dbFaceDown.setValue(playerFaceDown);
     }
 
-    public static void getHand(final PlayingCardAdapter playerHandAdapter) {
+    public static void putPlayerFaceUp(ArrayList<PlayingCard> playerFaceUp) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbCurrentPlayer = database.getReference("Player1");
+        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
+        DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
+        dbFaceUp.setValue(playerFaceUp);
+    }
+
+    public static void putPlayerHand(ArrayList<PlayingCard> playerHand) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
+        DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
+        dbHand.setValue(playerHand);
+    }
+
+    public static void putPile(ArrayList<PlayingCard> pile) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
+        dbPile.setValue(pile);
+    }
+
+    public static void putDeck(ArrayList<PlayingCard> deck) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
+        dbDeck.setValue(deck);
+    }
+
+    public static void getRemoteDeck(final PlayingCardAdapter deckAdapter, final ResultListener resultListener) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
+        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean deckExists = false;
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    deckAdapter.add(card.getValue(PlayingCard.class));
+                    deckExists = true;
+                }
+                resultListener.onResult(deckExists);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    public static void getRemoteCards(final PlayingCardAdapter deckAdapter,
+                                      final PlayingCardAdapter pileAdapter,
+                                      final PlayingCardAdapter playerHandAdapter,
+                                      final PlayingCardAdapter faceUpAdapter,
+                                      final PlayingCardAdapter faceDownAdapter,
+                                      final ResultListener resultListener) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        // Deck
+        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
+        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    if (deckAdapter != null) {
+                        deckAdapter.add(card.getValue(PlayingCard.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        // Pile
+        DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
+        dbPile.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    pileAdapter.add(card.getValue(PlayingCard.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        // Get current player
+        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
+        // Player Hand
         DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
         dbHand.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -65,20 +146,37 @@ public final class FirebaseUtils {
 
             }
         });
-    }
-
-    public static void checkForExistingGame(final ResultListener resultListener) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
-        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Player Face-Up
+        DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
+        dbFaceUp.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // returning "true" means there IS an existing game.
-                resultListener.onResult(dataSnapshot.getValue() != null);
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    faceUpAdapter.add(card.getValue(PlayingCard.class));
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        // Player Face-Down
+        DatabaseReference dbFaceDown = dbCurrentPlayer.child(DB_KEY_FACE_DOWN);
+        dbFaceDown.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean playerWasDealt = false;
+                for (DataSnapshot card : dataSnapshot.getChildren()) {
+                    faceDownAdapter.add(card.getValue(PlayingCard.class));
+                    playerWasDealt = true;
+                }
+                resultListener.onResult(playerWasDealt);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

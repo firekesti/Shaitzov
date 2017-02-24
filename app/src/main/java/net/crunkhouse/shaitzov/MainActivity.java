@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Instantiate cards
-        ArrayList<PlayingCard> playerHand = new ArrayList<>(INITIAL_HAND_SIZE);
+        final ArrayList<PlayingCard> playerHand = new ArrayList<>(INITIAL_HAND_SIZE);
         ArrayList<PlayingCard> playerFaceDown = new ArrayList<>(FACE_UP_AND_DOWN_CARD_AMOUNT);
         ArrayList<PlayingCard> playerFaceUp = new ArrayList<>(FACE_UP_AND_DOWN_CARD_AMOUNT);
         ArrayList<PlayingCard> pile = new ArrayList<>(0);
@@ -196,10 +196,10 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(playerHandView);
 
         // Then, check to see if there's a game in progress (if a deck exists in the database)
-        FirebaseUtils.checkForExistingGame(new FirebaseUtils.ResultListener() {
+        FirebaseUtils.getRemoteDeck(deckAdapter, new FirebaseUtils.ResultListener() {
             @Override
-            public void onResult(boolean isGameInProgress) {
-                if (!isGameInProgress) {
+            public void onResult(boolean deckExists) {
+                if (!deckExists) {
                     // Populate deck
                     ArrayList<PlayingCard> deck = PlayingCardUtils.makeDeck();
                     // Add player face-down cards
@@ -223,6 +223,33 @@ public class MainActivity extends AppCompatActivity {
                             playerHandAdapter.getCards(), faceUpAdapter.getCards(), faceDownAdapter.getCards());
                 } else {
                     // There's a game in progress, so sync the cards with the remote game
+                    FirebaseUtils.getRemoteCards(null, pileAdapter, playerHandAdapter, faceUpAdapter, faceDownAdapter,
+                            new FirebaseUtils.ResultListener() {
+                                @Override
+                                public void onResult(boolean playerWasDealt) {
+                                    if (!playerWasDealt) {
+                                        // If the player wasn't dealt in, then we have to grab cards from the deck
+                                        ArrayList<PlayingCard> deck = deckAdapter.getCards();
+                                        // Add player face-down cards
+                                        for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
+                                            faceDownAdapter.add(PlayingCardUtils.drawFrom(deck));
+                                        }
+                                        // Add player face-up cards
+                                        for (int i = 0; i < FACE_UP_AND_DOWN_CARD_AMOUNT; i++) {
+                                            faceUpAdapter.add(PlayingCardUtils.drawFrom(deck));
+                                        }
+                                        // Add player hand
+                                        for (int i = 0; i < INITIAL_HAND_SIZE; i++) {
+                                            playerHandAdapter.add(PlayingCardUtils.drawFrom(deck));
+                                        }
+                                        Collections.sort(playerHandAdapter.getCards());
+                                        deckAdapter.notifyDataSetChanged();
+                                        FirebaseUtils.putCards(deckAdapter.getCards(), pileAdapter.getCards(),
+                                                playerHandAdapter.getCards(), faceUpAdapter.getCards(),
+                                                faceDownAdapter.getCards());
+                                    }
+                                }
+                            });
                 }
             }
         });
@@ -235,11 +262,7 @@ public class MainActivity extends AppCompatActivity {
         godSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    godmode = true;
-                } else {
-                    godmode = false;
-                }
+                godmode = isChecked;
             }
         });
         return true;
