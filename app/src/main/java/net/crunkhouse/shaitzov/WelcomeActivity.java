@@ -46,9 +46,10 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     public void onClickContinue(View view) {
-        String username = nicknameView.getText().toString();
+        String username = nicknameView.getText().toString().trim();
         if (username.length() > 0) {
             // The user has entered a name
+            LocalPreferences.getInstance().setPlayerNickname(username);
             String text = getResources().getString(R.string.thanks_what_game, username);
             ((TextView) findViewById(R.id.thanks_what_game)).setText(text);
 
@@ -72,9 +73,8 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     public void onClickLetsGo(View view) {
-        Intent mainIntent = new Intent(this, MainActivity.class);
-        // TODO pass the player name and game ID, or save somewhere
-        startActivity(mainIntent);
+        // TODO save the Game ID once it matters
+        startActivity(new Intent(this, MainActivity.class));
     }
 
     @Override

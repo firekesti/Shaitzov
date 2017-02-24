@@ -140,6 +140,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(getString(R.string.app_name) + ": " +
+                    LocalPreferences.getInstance().getPlayerNickname());
+        }
+
         // Instantiate cards
         ArrayList<PlayingCard> playerHand = new ArrayList<>(INITIAL_HAND_SIZE);
         ArrayList<PlayingCard> playerFaceDown = new ArrayList<>(FACE_UP_AND_DOWN_CARD_AMOUNT);
