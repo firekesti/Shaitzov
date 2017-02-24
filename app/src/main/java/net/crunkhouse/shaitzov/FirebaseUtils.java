@@ -39,8 +39,7 @@ public final class FirebaseUtils {
         DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
         dbPile.setValue(pile);
 
-        // TODO: unique player IDs
-        DatabaseReference dbCurrentPlayer = database.getReference("Player1");
+        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
         DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
         dbHand.setValue(playerHand);
         DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
@@ -66,5 +65,25 @@ public final class FirebaseUtils {
 
             }
         });
+    }
+
+    public static void checkForExistingGame(final ResultListener resultListener) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
+        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // returning "true" means there IS an existing game.
+                resultListener.onResult(dataSnapshot.getValue() != null);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    interface ResultListener {
+        void onResult(boolean success);
     }
 }
