@@ -8,7 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Html;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -269,17 +271,23 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
 //            case R.id.action_settings:
 //                // TODO: settings view
 //                return true;
-//            default:
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+            case R.id.action_licenses:
+                new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogStyle)
+                        .setTitle(R.string.licenses)
+                        .setMessage(Html.fromHtml(getString(R.string.license_text)))
+                        .show();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private boolean playCardSuccessful(PlayingCard card) {
         if (godmode || GameRuleUtils.canPlayCardOnPile(card, pileAdapter.getCards(), currentDirection)) {

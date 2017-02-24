@@ -6,13 +6,18 @@
 
     <item
         android:id="@+id/action_godmode"
-        android:title="@string/action_godmode"
+        android:title="@string/godmode"
         app:actionLayout="@layout/toolbar_switch"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction"/>
 
     <!--<item-->
         <!--android:id="@+id/action_settings"-->
-        <!--android:title="@string/action_settings"-->
+        <!--android:title="@string/settings"-->
         <!--app:showAsAction="never"/>-->
+
+    <item
+        android:id="@+id/action_licenses"
+        android:title="@string/licenses"
+        app:showAsAction="never"/>
 </menu>
