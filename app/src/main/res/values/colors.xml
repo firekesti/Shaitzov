@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/walnut_wood</color>
+    <color name="colorPrimary">@color/mocha</color>
     <color name="colorPrimaryDark">@color/americano</color>
     <color name="colorAccent">@color/latte</color>
 
@@ -16,6 +16,7 @@
 
     <!-- Real Color Names -->
     <color name="americano">#241b12</color>
+    <color name="mocha">#492813</color>
     <color name="walnut_wood">#5a3926</color>
     <color name="latte">#a37f5b</color>
     <color name="cappuccino">#e0ccbe</color>

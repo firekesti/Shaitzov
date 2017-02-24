@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,15 +10,17 @@
         style="@style/welcome_card">
 
         <TextView
-            android:text="@string/welcome_to_shaitzov"
-            style="@style/welcome_text"/>
+            style="@style/welcome_text"
+            android:text="@string/welcome_to_shaitzov"/>
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/nickname_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            app:errorEnabled="true">
 
             <EditText
+                android:id="@+id/nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -26,23 +29,26 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:text="@string/continue_string"
-            style="@style/welcome_button"/>
+            android:id="@+id/continue_button"
+            style="@style/welcome_button"
+            android:onClick="onClickContinue"
+            android:text="@string/continue_string"/>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/part_two"
-        android:visibility="gone"
-        style="@style/welcome_card">
+        style="@style/welcome_card"
+        android:visibility="gone">
 
         <TextView
-            android:text="@string/thanks_what_game"
-            style="@style/welcome_text"/>
+            android:id="@+id/thanks_what_game"
+            style="@style/welcome_text"
+            android:text="@string/thanks_what_game"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            app:errorEnabled="true">
 
             <EditText
                 android:layout_width="match_parent"
@@ -53,7 +59,8 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:text="@string/lets_go"
-            style="@style/welcome_button"/>
+            style="@style/welcome_button"
+            android:onClick="onClickLetsGo"
+            android:text="@string/lets_go"/>
     </LinearLayout>
 </FrameLayout>
