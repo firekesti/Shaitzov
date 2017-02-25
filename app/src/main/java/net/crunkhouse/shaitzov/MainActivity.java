@@ -137,6 +137,15 @@ public class MainActivity extends AppCompatActivity {
             }
             return success;
         }
+
+        @Override
+        public void switchDirection() {
+            if (currentDirection == PileDirection.DOWN) {
+                currentDirection = PileDirection.UP;
+            } else {
+                currentDirection = PileDirection.DOWN;
+            }
+        }
     };
 
     @Override

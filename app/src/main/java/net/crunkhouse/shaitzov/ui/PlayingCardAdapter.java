@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import net.crunkhouse.shaitzov.cards.CardClickedListener;
 import net.crunkhouse.shaitzov.cards.CardSource;
+import net.crunkhouse.shaitzov.cards.GameRuleUtils;
 import net.crunkhouse.shaitzov.cards.PlayingCard;
 
 import java.util.ArrayList;
@@ -148,7 +149,8 @@ public class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.
             } else {
                 boolean success = false;
                 // For each selected card, try to play it - if one is successful, they all are
-                for (PlayingCard card : activeCards) {
+                for (int i = 0; i < activeCards.size(); i++) {
+                    PlayingCard card = activeCards.get(i);
                     if (listener.onCardClicked(source, card)) {
                         success = true;
                     }
@@ -156,6 +158,18 @@ public class PlayingCardAdapter extends RecyclerView.Adapter<PlayingCardAdapter.
                 if (!success) {
                     // If it wasn't successful, reset swipe offset and selected-ness for all cards
                     notifyDataSetChanged();
+                } else {
+                    // If successful, check if the card should switch directions
+                    if (GameRuleUtils.shouldDirectionSwitch(activeCards.get(0))) {
+                        // and if so, how many active cards there were.
+                        if (activeCards.size() == 2) {
+                            // If an even number of direction-switches were played simultaneously, the direction
+                            // would be the same as before, but it should actually be different.
+                            // We don't have to worry about 4, though, because it burns, so only check 2 of a kind.
+                            listener.switchDirection();
+                        }
+                    }
+                    // TODO: also check for 8, shouldn't skip multiple people, but 8 is out of scope for now
                 }
             }
             activeCards.clear();
