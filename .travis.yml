@@ -23,3 +23,12 @@ before_install:
 - chmod +x gradlew
 script:
 - ./gradlew clean build
+deploy:
+  provider: releases
+  api_key:
+    secure: oKzMQB4AV+wdxjVRZMz+g5mEhJ8iGM1KkI5ZnzCj0ah+Ap+vb6666guwcgBE8N5DvHC8pivtvqA+MB7W55tG9EoUxuPKjV58t4S6CPTo+QWePwCL09XqlrBA6VuBH7C1NtDbi2zmA9jAfasdZV1OHlTfQYBZSAYXP2Y1jcug0GnRyQzUpfEI+wV4CEUCNCNS7JuPQZudW3I22/1VjW/KK1zQdJG5ZKaCz7oU6MlllAYPy1C6YwJkVg2xOHWGPiDR61GrRaMSqYeXp29+Sy9yomXduoPvC27JEFuKVKsoNYekXpoXnz8YL4rWim7iqZyJBrBNmgORVNQsbkX8jZ/7Z/dQZC1ondXCE9yTixSUzYr+fevcNksaA+EKtLP7JItHp160I4rqUsbY8cbAnB2KPzJBlp+9B+0CLBYwPL6Vyaqacp/FmasaKigh7fnsoIucZNOWPeUQks5Ry2+/4RYoy7vab/O+Vblc5E3ADkZbkQzOMq9VreHFs/U3jWexowWgVYf1pfXTlZqZUDX7h1JV6uM3n5iwaSAEzaTJnnug3dK3YFjxC32x1nyIk2023rIx1sB+pPk/J3hbX8nhLChhp2wrkA7Lodcg8x4z63PrdEcot/zetiI5PngzwQ8Cy3RrU64wHxop0tT2UwiJUv6Le6eu91O93XBE2QwKrVtPJpQ=
+  file: app/build/outputs/apk/app-debug.apk
+  skip_cleanup: true
+  on:
+    repo: firekesti/Shaitzov
+    tags: true
