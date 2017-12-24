@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "net.crunkhouse.shaitzov"
         minSdkVersion 17
@@ -26,10 +25,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // App
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:recyclerview-v7:25.2.0'
-    compile 'com.android.support:design:25.2.0'
-    compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
+    compile 'com.android.support:recyclerview-v7:25.4.0'
+    compile 'com.android.support:design:25.4.0'
+    compile 'com.google.firebase:firebase-database:11.8.0'
 
     // Tests
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
