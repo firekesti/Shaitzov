@@ -2,7 +2,6 @@ package net.crunkhouse.shaitzov;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 
 public final class LocalPreferences {
 
@@ -43,7 +42,6 @@ public final class LocalPreferences {
         return instance;
     }
 
-    @Nullable
     public String getGameId() {
         return prefs.getString(GAME_ID, null);
     }
