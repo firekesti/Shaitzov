@@ -1,6 +1,7 @@
 package net.crunkhouse.shaitzov;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -290,6 +291,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_new_game:
+                new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogStyle)
+                        .setMessage(R.string.sure_to_exit)
+                        .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                finish();
+                                startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+                return true;
 //            case R.id.action_settings:
 //                // TODO: settings view
 //                return true;

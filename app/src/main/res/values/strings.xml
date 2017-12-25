@@ -11,4 +11,8 @@
     <string name="thanks_what_game" formatted="false">Thanks, %s.\nWhat game do you want to join?</string>
     <string name="err_enter_nickname">Please enter a nickname!</string>
     <string name="licenses">Licenses</string>
+    <string name="new_game">New Game</string>
+    <string name="exit">Exit</string>
+    <string name="cancel">Cancel</string>
+    <string name="sure_to_exit">Are you sure you want to exit this game?</string>
 </resources>

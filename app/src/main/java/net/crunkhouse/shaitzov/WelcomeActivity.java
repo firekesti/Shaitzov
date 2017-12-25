@@ -79,6 +79,7 @@ public class WelcomeActivity extends AppCompatActivity {
     public void onClickLetsGo(View view) {
         // TODO save the Game ID once it matters
         startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     @Override
