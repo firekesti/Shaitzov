@@ -2,6 +2,7 @@ package net.crunkhouse.shaitzov.cards;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * Utilities for card-related functions.
@@ -46,5 +47,16 @@ public final class PlayingCardUtils {
 
     public static PlayingCard drawFrom(ArrayList<PlayingCard> deck) {
         return deck.remove(0);
+    }
+
+    public static ArrayList<PlayingCard> makeCardListFrom(ArrayList<HashMap> cardsFromServer) {
+        ArrayList<PlayingCard> cards = new ArrayList<>();
+        for (int i = 0; i < cardsFromServer.size(); i++) {
+            HashMap serverCard = cardsFromServer.get(i);
+            int value = (int) (long) serverCard.get("value");
+            PlayingCard.Suit suit = PlayingCard.Suit.valueOf((String) serverCard.get("suit"));
+            cards.add(new PlayingCard(value, suit));
+        }
+        return cards;
     }
 }

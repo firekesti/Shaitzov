@@ -2,8 +2,8 @@ package net.crunkhouse.shaitzov.cards;
 
 import android.support.annotation.NonNull;
 
-import com.google.firebase.database.Exclude;
-import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
  * A model for a playing card.
