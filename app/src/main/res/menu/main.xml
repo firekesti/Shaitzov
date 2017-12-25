@@ -17,6 +17,11 @@
         <!--app:showAsAction="never"/>-->
 
     <item
+        android:id="@+id/action_new_game"
+        android:title="@string/new_game"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_licenses"
         android:title="@string/licenses"
         app:showAsAction="never"/>
