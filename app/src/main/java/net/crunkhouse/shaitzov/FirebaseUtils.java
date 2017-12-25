@@ -61,7 +61,7 @@ final class FirebaseUtils {
         map.put(DB_KEY_FACE_DOWN, playerFaceDown);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .collection(DB_KEY_PLAYERS)
                 .document(LocalPreferences.getInstance().getPlayerNickname())
                 .set(map, SetOptions.merge());
@@ -72,7 +72,7 @@ final class FirebaseUtils {
         map.put(DB_KEY_FACE_UP, playerFaceUp);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .collection(DB_KEY_PLAYERS)
                 .document(LocalPreferences.getInstance().getPlayerNickname())
                 .set(map, SetOptions.merge());
@@ -83,7 +83,7 @@ final class FirebaseUtils {
         map.put(DB_KEY_HAND, playerHand);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .collection(DB_KEY_PLAYERS)
                 .document(LocalPreferences.getInstance().getPlayerNickname())
                 .set(map, SetOptions.merge());
@@ -94,8 +94,7 @@ final class FirebaseUtils {
         map.put(DB_KEY_PILE, pile);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                // TODO game id
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .set(map, SetOptions.merge());
     }
 
@@ -104,8 +103,7 @@ final class FirebaseUtils {
         map.put(DB_KEY_DECK, deck);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                // TODO game id
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .set(map, SetOptions.merge());
     }
 
@@ -113,8 +111,7 @@ final class FirebaseUtils {
         Timber.d("Requesting remote game");
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                // TODO game id
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -138,8 +135,7 @@ final class FirebaseUtils {
                                final ResultListener playerWasDealtListener) {
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                // TODO game id
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -154,7 +150,7 @@ final class FirebaseUtils {
                 });
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document("1")
+                .document(LocalPreferences.getInstance().getGameId())
                 .collection(DB_KEY_PLAYERS)
                 .document(LocalPreferences.getInstance().getPlayerNickname())
                 .get()

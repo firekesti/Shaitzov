@@ -22,6 +22,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private EditText nicknameView;
     private TextInputLayout nicknameLayout;
+    private EditText gameIdView;
+    private TextInputLayout gameIdLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,27 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 nicknameLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        gameIdView = (EditText) findViewById(R.id.game_id);
+        // If the user has a previous game id, prepopulate it:
+        gameIdView.setText(LocalPreferences.getInstance().getGameId());
+        gameIdLayout = (TextInputLayout) findViewById(R.id.game_id_layout);
+        gameIdView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                gameIdLayout.setError(null);
             }
 
             @Override
@@ -77,9 +100,16 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     public void onClickLetsGo(View view) {
-        // TODO save the Game ID once it matters
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        String gameId = gameIdView.getText().toString().trim();
+        if (gameId.length() > 0) {
+            // The user has entered a game Id
+            LocalPreferences.getInstance().setGameId(gameId);
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        } else {
+            // Show an error, the user needs to enter a game ID!
+            gameIdLayout.setError(getString(R.string.err_enter_game_id));
+        }
     }
 
     @Override
