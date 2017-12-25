@@ -1,24 +1,41 @@
 package net.crunkhouse.shaitzov;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import net.crunkhouse.shaitzov.cards.PlayingCard;
+import net.crunkhouse.shaitzov.cards.PlayingCardUtils;
 import net.crunkhouse.shaitzov.ui.PlayingCardAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import timber.log.Timber;
 
 /**
  * Collect Firebase-related constants and methods
  */
 
-public final class FirebaseUtils {
+final class FirebaseUtils {
     // Global database items, visible to everyone
+    private static final String DB_KEY_GAMES = "games";
     private static final String DB_KEY_DECK = "deck";
     private static final String DB_KEY_PILE = "pile";
+    private static final String DB_KEY_PLAYERS = "players";
     // Database items nested under the player name
     private static final String DB_KEY_HAND = "hand";
     private static final String DB_KEY_FACE_UP = "face_up";
@@ -27,11 +44,11 @@ public final class FirebaseUtils {
     private FirebaseUtils() {
     }
 
-    public static void putCards(ArrayList<PlayingCard> deck,
-                                ArrayList<PlayingCard> pile,
-                                ArrayList<PlayingCard> playerHand,
-                                ArrayList<PlayingCard> playerFaceUp,
-                                ArrayList<PlayingCard> playerFaceDown) {
+    static void putCards(@NonNull ArrayList<PlayingCard> deck,
+                         @NonNull ArrayList<PlayingCard> pile,
+                         @NonNull ArrayList<PlayingCard> playerHand,
+                         @NonNull ArrayList<PlayingCard> playerFaceUp,
+                         @NonNull ArrayList<PlayingCard> playerFaceDown) {
         putDeck(deck);
         putPile(pile);
         putPlayerHand(playerHand);
@@ -39,150 +56,170 @@ public final class FirebaseUtils {
         putPlayerFaceDown(playerFaceDown);
     }
 
-    public static void putPlayerFaceDown(ArrayList<PlayingCard> playerFaceDown) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
-        DatabaseReference dbFaceDown = dbCurrentPlayer.child(DB_KEY_FACE_DOWN);
-        dbFaceDown.setValue(playerFaceDown);
+    private static void putPlayerFaceDown(@NonNull ArrayList<PlayingCard> playerFaceDown) {
+        Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
+        map.put(DB_KEY_FACE_DOWN, playerFaceDown);
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                .document("1")
+                .collection(DB_KEY_PLAYERS)
+                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .set(map, SetOptions.merge());
     }
 
-    public static void putPlayerFaceUp(ArrayList<PlayingCard> playerFaceUp) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
-        DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
-        dbFaceUp.setValue(playerFaceUp);
+    private static void putPlayerFaceUp(@NonNull ArrayList<PlayingCard> playerFaceUp) {
+        Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
+        map.put(DB_KEY_FACE_UP, playerFaceUp);
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                .document("1")
+                .collection(DB_KEY_PLAYERS)
+                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .set(map, SetOptions.merge());
     }
 
-    public static void putPlayerHand(ArrayList<PlayingCard> playerHand) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
-        DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
-        dbHand.setValue(playerHand);
+    private static void putPlayerHand(@NonNull ArrayList<PlayingCard> playerHand) {
+        Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
+        map.put(DB_KEY_HAND, playerHand);
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                .document("1")
+                .collection(DB_KEY_PLAYERS)
+                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .set(map, SetOptions.merge());
     }
 
-    public static void putPile(ArrayList<PlayingCard> pile) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
-        dbPile.setValue(pile);
+    private static void putPile(@NonNull ArrayList<PlayingCard> pile) {
+        Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
+        map.put(DB_KEY_PILE, pile);
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                // TODO game id
+                .document("1")
+                .set(map, SetOptions.merge());
     }
 
-    public static void putDeck(ArrayList<PlayingCard> deck) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
-        dbDeck.setValue(deck);
+    private static void putDeck(@NonNull ArrayList<PlayingCard> deck) {
+        Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
+        map.put(DB_KEY_DECK, deck);
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                // TODO game id
+                .document("1")
+                .set(map, SetOptions.merge());
     }
 
-    public static void getRemoteDeck(final PlayingCardAdapter deckAdapter, final ResultListener resultListener) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
-        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean deckExists = false;
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    deckAdapter.add(card.getValue(PlayingCard.class));
-                    deckExists = true;
-                }
-                resultListener.onResult(deckExists);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-    public static void getRemoteCards(final PlayingCardAdapter deckAdapter,
-                                      final PlayingCardAdapter pileAdapter,
-                                      final PlayingCardAdapter playerHandAdapter,
-                                      final PlayingCardAdapter faceUpAdapter,
-                                      final PlayingCardAdapter faceDownAdapter,
-                                      final ResultListener resultListener) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        // Deck
-        DatabaseReference dbDeck = database.getReference(DB_KEY_DECK);
-        dbDeck.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    if (deckAdapter != null) {
-                        deckAdapter.add(card.getValue(PlayingCard.class));
+    static void checkGameExists(final ResultListener resultListener) {
+        Timber.d("Requesting remote game");
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                // TODO game id
+                .document("1")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        Timber.d("Requesting remote game complete");
+                        boolean deckExists = false;
+                        DocumentSnapshot document = task.getResult();
+                        if (task.isSuccessful() && document.exists()) {
+                            deckExists = true;
+                        }
+                        resultListener.onResult(deckExists);
                     }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-        // Pile
-        DatabaseReference dbPile = database.getReference(DB_KEY_PILE);
-        dbPile.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    pileAdapter.add(card.getValue(PlayingCard.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-        // Get current player
-        DatabaseReference dbCurrentPlayer = database.getReference(LocalPreferences.getInstance().getPlayerNickname());
-        // Player Hand
-        DatabaseReference dbHand = dbCurrentPlayer.child(DB_KEY_HAND);
-        dbHand.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    playerHandAdapter.add(card.getValue(PlayingCard.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        // Player Face-Up
-        DatabaseReference dbFaceUp = dbCurrentPlayer.child(DB_KEY_FACE_UP);
-        dbFaceUp.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    faceUpAdapter.add(card.getValue(PlayingCard.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        // Player Face-Down
-        DatabaseReference dbFaceDown = dbCurrentPlayer.child(DB_KEY_FACE_DOWN);
-        dbFaceDown.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean playerWasDealt = false;
-                for (DataSnapshot card : dataSnapshot.getChildren()) {
-                    faceDownAdapter.add(card.getValue(PlayingCard.class));
-                    playerWasDealt = true;
-                }
-                resultListener.onResult(playerWasDealt);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+                });
     }
 
-    public static void clearGame() {
-        putCards(null, null, null, null, null);
+    static void getRemoteCards(final PlayingCardAdapter deckAdapter,
+                               final PlayingCardAdapter pileAdapter,
+                               final PlayingCardAdapter playerHandAdapter,
+                               final PlayingCardAdapter faceUpAdapter,
+                               final PlayingCardAdapter faceDownAdapter,
+                               final ResultListener playerWasDealtListener) {
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                // TODO game id
+                .document("1")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        if (task.isSuccessful() && document.exists()) {
+                            Map<String, Object> data = document.getData();
+                            deckAdapter.addAll(PlayingCardUtils.makeCardListFrom((ArrayList<HashMap>) data.get(DB_KEY_DECK)));
+                            pileAdapter.addAll(PlayingCardUtils.makeCardListFrom((ArrayList<HashMap>) data.get(DB_KEY_PILE)));
+                        }
+                    }
+                });
+        FirebaseFirestore.getInstance()
+                .collection(DB_KEY_GAMES)
+                .document("1")
+                .collection(DB_KEY_PLAYERS)
+                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        // Player-specific
+                        DocumentSnapshot user = task.getResult();
+                        if (task.isSuccessful() && user.exists()) {
+                            Map<String, Object> data = user.getData();
+                            playerHandAdapter.addAll(PlayingCardUtils.makeCardListFrom((ArrayList<HashMap>) data.get(DB_KEY_HAND)));
+                            faceUpAdapter.addAll(PlayingCardUtils.makeCardListFrom((ArrayList<HashMap>) data.get(DB_KEY_FACE_UP)));
+                            faceDownAdapter.addAll(PlayingCardUtils.makeCardListFrom((ArrayList<HashMap>) data.get(DB_KEY_FACE_DOWN)));
+
+                            playerWasDealtListener.onResult(true);
+                        } else {
+                            playerWasDealtListener.onResult(false);
+                        }
+                    }
+                });
+    }
+
+    static void clearGameInBackground() {
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_DECK));
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PILE));
+
+        String playerName = LocalPreferences.getInstance().getPlayerNickname();
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_HAND));
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_FACE_UP));
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_FACE_DOWN));
+        deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS));
+    }
+
+    /**
+     * Delete all documents in a collection. Uses an Executor to perform work on a background
+     * thread. This does *not* automatically discover and delete subcollections.
+     */
+    private static void deleteCollection(final CollectionReference collection) {
+        new DeleteTask().execute(collection);
+    }
+
+    // AsyncTask
+    private static class DeleteTask extends AsyncTask<CollectionReference, Void, Void> {
+        @Override
+        protected Void doInBackground(CollectionReference... collectionReferences) {
+            CollectionReference collection = collectionReferences[0];
+            // Get the first batch of documents in the collection
+            Query query = collection.orderBy(FieldPath.documentId()).limit(100);
+            QuerySnapshot querySnapshot = null;
+            try {
+                querySnapshot = Tasks.await(query.get());
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            WriteBatch batch = query.getFirestore().batch();
+            if (querySnapshot != null) {
+                for (DocumentSnapshot snapshot : querySnapshot) {
+                    batch.delete(snapshot.getReference());
+                }
+            }
+            batch.commit();
+            return null;
+        }
     }
 
     interface ResultListener {

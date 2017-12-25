@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FirebaseUtils.clearGame();
+                        FirebaseUtils.clearGameInBackground();
                         // TODO: let them watch the game until it's finished, once we have multiplayer
                         MainActivity.this.recreate();
                     }
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(playerHandView);
 
         // Then, check to see if there's a game in progress (if a deck exists in the database)
-        FirebaseUtils.getRemoteDeck(deckAdapter, new FirebaseUtils.ResultListener() {
+        FirebaseUtils.checkGameExists(new FirebaseUtils.ResultListener() {
             @Override
             public void onResult(boolean deckExists) {
                 if (!deckExists) {
@@ -231,11 +231,15 @@ public class MainActivity extends AppCompatActivity {
                         deckAdapter.add(card);
                     }
                     // Write the cards to the database
-                    FirebaseUtils.putCards(deck, null,
-                            playerHandAdapter.getCards(), faceUpAdapter.getCards(), faceDownAdapter.getCards());
+                    FirebaseUtils.putCards(
+                            deck,
+                            new ArrayList<PlayingCard>(),
+                            playerHandAdapter.getCards(),
+                            faceUpAdapter.getCards(),
+                            faceDownAdapter.getCards());
                 } else {
                     // There's a game in progress, so sync the cards with the remote game
-                    FirebaseUtils.getRemoteCards(null, pileAdapter, playerHandAdapter, faceUpAdapter, faceDownAdapter,
+                    FirebaseUtils.getRemoteCards(deckAdapter, pileAdapter, playerHandAdapter, faceUpAdapter, faceDownAdapter,
                             new FirebaseUtils.ResultListener() {
                                 @Override
                                 public void onResult(boolean playerWasDealt) {
@@ -256,8 +260,11 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                         Collections.sort(playerHandAdapter.getCards());
                                         deckAdapter.notifyDataSetChanged();
-                                        FirebaseUtils.putCards(deckAdapter.getCards(), pileAdapter.getCards(),
-                                                playerHandAdapter.getCards(), faceUpAdapter.getCards(),
+                                        FirebaseUtils.putCards(
+                                                deckAdapter.getCards(),
+                                                pileAdapter.getCards(),
+                                                playerHandAdapter.getCards(),
+                                                faceUpAdapter.getCards(),
                                                 faceDownAdapter.getCards());
                                     }
                                 }

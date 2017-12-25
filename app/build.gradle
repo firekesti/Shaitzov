@@ -29,7 +29,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'com.android.support:recyclerview-v7:25.4.0'
     compile 'com.android.support:design:25.4.0'
-    compile 'com.google.firebase:firebase-database:11.8.0'
+    compile 'com.google.firebase:firebase-firestore:11.8.0'
+    implementation 'com.jakewharton.timber:timber:4.6.0'
 
     // Crashlytics
     compile 'com.google.firebase:firebase-core:11.8.0'
