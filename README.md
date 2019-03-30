@@ -1,2 +1,2 @@
-# Shaitzov ![Travis-CI](https://api.travis-ci.org/firekesti/Shaitzov.svg)
+# Shaitzov 
 A card game for Android.
