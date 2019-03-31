@@ -31,7 +31,6 @@
         <Button
             android:id="@+id/continue_button"
             style="@style/welcome_button"
-            android:onClick="onClickContinue"
             android:text="@string/continue_string"/>
     </LinearLayout>
 
@@ -57,12 +56,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:hint="@string/game_id"
-                android:inputType="number"/>
+                android:inputType="number"
+                android:importantForAutofill="no"/>
         </android.support.design.widget.TextInputLayout>
 
         <Button
+            android:id="@+id/lets_go_button"
             style="@style/welcome_button"
-            android:onClick="onClickLetsGo"
             android:text="@string/lets_go"/>
     </LinearLayout>
 </FrameLayout>

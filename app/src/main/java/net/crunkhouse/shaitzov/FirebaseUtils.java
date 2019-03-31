@@ -48,70 +48,77 @@ final class FirebaseUtils {
                          @NonNull ArrayList<PlayingCard> pile,
                          @NonNull ArrayList<PlayingCard> playerHand,
                          @NonNull ArrayList<PlayingCard> playerFaceUp,
-                         @NonNull ArrayList<PlayingCard> playerFaceDown) {
-        putDeck(deck);
-        putPile(pile);
-        putPlayerHand(playerHand);
-        putPlayerFaceUp(playerFaceUp);
-        putPlayerFaceDown(playerFaceDown);
+                         @NonNull ArrayList<PlayingCard> playerFaceDown,
+                         LocalPreferences prefs) {
+        putDeck(deck, prefs);
+        putPile(pile, prefs);
+        putPlayerHand(playerHand, prefs);
+        putPlayerFaceUp(playerFaceUp, prefs);
+        putPlayerFaceDown(playerFaceDown, prefs);
     }
 
-    private static void putPlayerFaceDown(@NonNull ArrayList<PlayingCard> playerFaceDown) {
+    private static void putPlayerFaceDown(@NonNull ArrayList<PlayingCard> playerFaceDown,
+                                          LocalPreferences prefs) {
         Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
         map.put(DB_KEY_FACE_DOWN, playerFaceDown);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .collection(DB_KEY_PLAYERS)
-                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .document(prefs.getPlayerNickname())
                 .set(map, SetOptions.merge());
     }
 
-    private static void putPlayerFaceUp(@NonNull ArrayList<PlayingCard> playerFaceUp) {
+    private static void putPlayerFaceUp(@NonNull ArrayList<PlayingCard> playerFaceUp,
+                                        LocalPreferences prefs) {
         Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
         map.put(DB_KEY_FACE_UP, playerFaceUp);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .collection(DB_KEY_PLAYERS)
-                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .document(prefs.getPlayerNickname())
                 .set(map, SetOptions.merge());
     }
 
-    private static void putPlayerHand(@NonNull ArrayList<PlayingCard> playerHand) {
+    private static void putPlayerHand(@NonNull ArrayList<PlayingCard> playerHand,
+                                      LocalPreferences prefs) {
         Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
         map.put(DB_KEY_HAND, playerHand);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .collection(DB_KEY_PLAYERS)
-                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .document(prefs.getPlayerNickname())
                 .set(map, SetOptions.merge());
     }
 
-    private static void putPile(@NonNull ArrayList<PlayingCard> pile) {
+    private static void putPile(@NonNull ArrayList<PlayingCard> pile,
+                                LocalPreferences prefs) {
         Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
         map.put(DB_KEY_PILE, pile);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .set(map, SetOptions.merge());
     }
 
-    private static void putDeck(@NonNull ArrayList<PlayingCard> deck) {
+    private static void putDeck(@NonNull ArrayList<PlayingCard> deck,
+                                LocalPreferences prefs) {
         Map<String, ArrayList<PlayingCard>> map = new HashMap<>();
         map.put(DB_KEY_DECK, deck);
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .set(map, SetOptions.merge());
     }
 
-    static void checkGameExists(final ResultListener resultListener) {
+    static void checkGameExists(final ResultListener resultListener,
+                                String gameId) {
         Timber.d("Requesting remote game");
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(gameId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -132,10 +139,11 @@ final class FirebaseUtils {
                                final PlayingCardAdapter playerHandAdapter,
                                final PlayingCardAdapter faceUpAdapter,
                                final PlayingCardAdapter faceDownAdapter,
-                               final ResultListener playerWasDealtListener) {
+                               final ResultListener playerWasDealtListener,
+                               LocalPreferences prefs) {
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -150,9 +158,9 @@ final class FirebaseUtils {
                 });
         FirebaseFirestore.getInstance()
                 .collection(DB_KEY_GAMES)
-                .document(LocalPreferences.getInstance().getGameId())
+                .document(prefs.getGameId())
                 .collection(DB_KEY_PLAYERS)
-                .document(LocalPreferences.getInstance().getPlayerNickname())
+                .document(prefs.getPlayerNickname())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -173,11 +181,11 @@ final class FirebaseUtils {
                 });
     }
 
-    static void clearGameInBackground() {
+    static void clearGameInBackground(LocalPreferences prefs) {
         deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_DECK));
         deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PILE));
 
-        String playerName = LocalPreferences.getInstance().getPlayerNickname();
+        String playerName = prefs.getPlayerNickname();
         deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_HAND));
         deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_FACE_UP));
         deleteCollection(FirebaseFirestore.getInstance().collection(DB_KEY_PLAYERS).document(playerName).collection(DB_KEY_FACE_DOWN));

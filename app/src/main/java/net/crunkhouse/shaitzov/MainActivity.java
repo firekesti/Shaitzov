@@ -27,6 +27,7 @@ import net.crunkhouse.shaitzov.ui.HandOverlapDecorator;
 import net.crunkhouse.shaitzov.ui.PileOverlapDecorator;
 import net.crunkhouse.shaitzov.ui.PlayingCardAdapter;
 import net.crunkhouse.shaitzov.ui.SimpleItemTouchHelperCallback;
+import net.crunkhouse.shaitzov.welcome.WelcomeActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView playerHandView;
     private RecyclerView pileView;
     private PileDirection currentDirection = PileDirection.UP;
+    private LocalPreferences prefs;
     private CardClickedListener cardClickedListener = new CardClickedListener() {
         @Override
         public boolean onCardClicked(CardSource source, PlayingCard card) {
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("New game", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FirebaseUtils.clearGameInBackground();
+                        FirebaseUtils.clearGameInBackground(prefs);
                         // TODO: let them watch the game until it's finished, once we have multiplayer
                         MainActivity.this.recreate();
                     }
@@ -153,10 +155,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        prefs = ((ShaitzovApplication) getApplication()).prefs;
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getString(R.string.app_name) + ": " +
-                    LocalPreferences.getInstance().getPlayerNickname());
+                    prefs.getPlayerNickname());
         }
 
         // Instantiate cards
@@ -166,35 +169,35 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<PlayingCard> pile = new ArrayList<>(0);
 
         // Set up face-down view
-        RecyclerView faceDownView = (RecyclerView) findViewById(R.id.player_facedown);
+        RecyclerView faceDownView = findViewById(R.id.player_facedown);
         faceDownAdapter = new PlayingCardAdapter(playerFaceDown, CardSource.FACE_DOWN, cardClickedListener);
         faceDownView.setAdapter(faceDownAdapter);
         faceDownView.addItemDecoration(new CardSpacingDecorator(faceDownView.getContext()));
         faceDownView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Set up face-down view
-        RecyclerView faceUpView = (RecyclerView) findViewById(R.id.player_faceup);
+        RecyclerView faceUpView = findViewById(R.id.player_faceup);
         faceUpAdapter = new PlayingCardAdapter(playerFaceUp, CardSource.FACE_UP, cardClickedListener);
         faceUpView.setAdapter(faceUpAdapter);
         faceUpView.addItemDecoration(new CardSpacingDecorator(faceUpView.getContext()));
         faceUpView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Set up player hand view
-        playerHandView = (RecyclerView) findViewById(R.id.player_hand);
+        playerHandView = findViewById(R.id.player_hand);
         playerHandAdapter = new PlayingCardAdapter(playerHand, CardSource.HAND, cardClickedListener);
         playerHandView.setAdapter(playerHandAdapter);
         playerHandView.addItemDecoration(new HandOverlapDecorator(playerHandView.getContext()));
         playerHandView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Set up deck view
-        RecyclerView deckView = (RecyclerView) findViewById(R.id.deck);
+        RecyclerView deckView = findViewById(R.id.deck);
         deckAdapter = new PlayingCardAdapter(new ArrayList<PlayingCard>(0), CardSource.DECK, cardClickedListener);
         deckView.setAdapter(deckAdapter);
         deckView.addItemDecoration(new DeckOverlapDecorator(deckView.getContext()));
         deckView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
 
         // Set up pile view
-        pileView = (RecyclerView) findViewById(R.id.pile);
+        pileView = findViewById(R.id.pile);
         pileAdapter = new PlayingCardAdapter(pile, CardSource.PILE, cardClickedListener);
         pileView.setAdapter(pileAdapter);
         pileView.addItemDecoration(new PileOverlapDecorator(pileView.getContext()));
@@ -237,7 +240,8 @@ public class MainActivity extends AppCompatActivity {
                             new ArrayList<PlayingCard>(),
                             playerHandAdapter.getCards(),
                             faceUpAdapter.getCards(),
-                            faceDownAdapter.getCards());
+                            faceDownAdapter.getCards(),
+                            prefs);
                 } else {
                     // There's a game in progress, so sync the cards with the remote game
                     FirebaseUtils.getRemoteCards(deckAdapter, pileAdapter, playerHandAdapter, faceUpAdapter, faceDownAdapter,
@@ -266,19 +270,20 @@ public class MainActivity extends AppCompatActivity {
                                                 pileAdapter.getCards(),
                                                 playerHandAdapter.getCards(),
                                                 faceUpAdapter.getCards(),
-                                                faceDownAdapter.getCards());
+                                                faceDownAdapter.getCards(),
+                                                prefs);
                                     }
                                 }
-                            });
+                            }, prefs);
                 }
             }
-        });
+        }, prefs.getGameId());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        Switch godSwitch = (Switch) menu.findItem(R.id.action_godmode).getActionView().findViewById(R.id.action_switch);
+        Switch godSwitch = menu.findItem(R.id.action_godmode).getActionView().findViewById(R.id.action_switch);
         godSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
